@@ -151,29 +151,28 @@
             width: 100%;
             gap: 0;
             align-items: stretch;
+            box-sizing: border-box;
+            overflow: hidden;
         }
         .okrug-btn {
             flex: 1 1 65%;
             flex-basis: 65%;
-            min-width: 0;
             margin-bottom: 0;
             border-radius: 10px 0 0 10px;
             border-right: none;
             height: 44px;
             font-size: 16px;
-            padding: 8px 0;
+            padding: 6px 0;
             box-sizing: border-box;
+            border-width: 1px;
         }
         .areas-toggle {
             flex: 1 1 35%;
             flex-basis: 35%;
-            min-width: 0;
-            max-width: none;
-            width: auto;
             margin: 0;
             height: 44px;
             font-size: 16px;
-            padding: 8px 0;
+            padding: 6px 0;
             background: var(--tg-theme-bg-color, #ffffff);
             border: 1px solid var(--tg-theme-button-color, #2481cc);
             border-left: none;
@@ -187,6 +186,7 @@
             align-items: center;
             justify-content: center;
             box-sizing: border-box;
+            border-width: 1px;
         }
         .areas-toggle:hover {
             background: rgba(36,129,204,0.07);
