@@ -172,12 +172,20 @@
         }
         .areas-list-section {
             width: 100%;
-            display: none;
-            background: #fff;
+            background: transparent;
             border-radius: 0 0 10px 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            box-shadow: none;
             margin-top: 0;
             padding-bottom: 8px;
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            transition: max-height 0.35s cubic-bezier(.4,0,.2,1), opacity 0.25s;
+        }
+        .areas-list-section.open {
+            max-height: 500px;
+            opacity: 1;
+            transition: max-height 0.5s cubic-bezier(.4,0,.2,1), opacity 0.3s;
         }
     </style>
 </head>
@@ -340,8 +348,6 @@
         function buildDistrictsUI(districtsData) {
             const districtsList = document.getElementById('districts-list');
             districtsList.innerHTML = '';
-            const areasContainer = document.getElementById('areas-container');
-            areasContainer.innerHTML = '';
             Object.keys(districtsData).forEach(okrug => {
                 // Блок округа
                 const okrugBlock = document.createElement('div');
@@ -363,6 +369,7 @@
                 okrugBlock.appendChild(okrugBtn);
 
                 // Ярлычок-кнопка "Районы"
+                let areasSection = null;
                 if (districtsData[okrug].length > 0) {
                     const areasToggle = document.createElement('button');
                     areasToggle.className = 'areas-toggle';
@@ -370,25 +377,23 @@
                     areasToggle.setAttribute('aria-label', 'Показать районы');
                     areasToggle.addEventListener('click', function(e) {
                         e.stopPropagation();
-                        const areaSection = document.getElementById('areas-section-' + okrug);
-                        if (areaSection) {
-                            const isOpen = areaSection.style.display === 'block';
-                            areaSection.style.display = isOpen ? 'none' : 'block';
-                            areasToggle.innerHTML = isOpen ? 'Районы <span style="font-size:18px;">&#8595;</span>' : 'Районы <span style="font-size:18px;">&#8593;</span>';
+                        if (areasSection) {
+                            const isOpen = areasSection.classList.contains('open');
+                            if (isOpen) {
+                                areasSection.classList.remove('open');
+                                areasToggle.innerHTML = 'Районы <span style="font-size:18px;">&#8595;</span>';
+                            } else {
+                                areasSection.classList.add('open');
+                                areasToggle.innerHTML = 'Районы <span style="font-size:18px;">&#8593;</span>';
+                            }
                         }
                     });
                     okrugBlock.appendChild(areasToggle);
-                }
-                districtsList.appendChild(okrugBlock);
-            });
 
-            // Районы (секции скрыты по умолчанию)
-            Object.keys(districtsData).forEach(okrug => {
-                if (districtsData[okrug].length > 0) {
-                    const section = document.createElement('div');
-                    section.id = 'areas-section-' + okrug;
-                    section.className = 'areas-list-section';
-                    section.style.display = 'none';
+                    // Секция районов (внутри блока округа)
+                    areasSection = document.createElement('div');
+                    areasSection.id = 'areas-section-' + okrug;
+                    areasSection.className = 'areas-list-section';
                     const areaList = document.createElement('div');
                     areaList.className = 'filter-options';
                     districtsData[okrug].forEach(area => {
@@ -406,11 +411,10 @@
                         });
                         areaList.appendChild(areaBtn);
                     });
-                    section.appendChild(areaList);
-                    // Вставляем секцию районов сразу после блока округа
-                    const okrugBlock = districtsList.querySelector('.okrug-block:nth-child(' + (Object.keys(districtsData).indexOf(okrug)+1) + ')');
-                    okrugBlock && okrugBlock.after(section);
+                    areasSection.appendChild(areaList);
+                    okrugBlock.appendChild(areasSection);
                 }
+                districtsList.appendChild(okrugBlock);
             });
         }
 
