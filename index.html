@@ -127,6 +127,17 @@
             max-width: 100vw;
             overflow-x: hidden;
         }
+        .metro-inputs {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .metro-inputs input[type="number"] {
+            max-width: 100%;
+            width: 100%;
+            box-sizing: border-box;
+        }
     </style>
 </head>
 <body>
@@ -162,7 +173,7 @@
 
         <div class="filter-group">
             <h3>🚇 Время до метро</h3>
-            <div class="metro-inputs">
+            <div class="metro-inputs" style="flex-direction: column; gap: 8px;">
                 <input type="number" id="metro-time" placeholder="Время (мин)">
                 <div class="filter-options" id="metro-transport">
                     <button class="filter-option" data-value="walk">🚶 Пешком</button>
@@ -172,73 +183,15 @@
         </div>
 
         <div class="filter-group">
-            <h3>📍 Округа и районы Москвы</h3>
+            <h3>📍 Округа Москвы</h3>
             <div class="filter-options" id="districts">
-                <button class="filter-option" data-value="ЦАО">ЦАО</button>
-                <button class="filter-option" data-value="САО">САО</button>
-                <button class="filter-option" data-value="СВАО">СВАО</button>
-                <button class="filter-option" data-value="ВАО">ВАО</button>
-                <button class="filter-option" data-value="ЮВАО">ЮВАО</button>
-                <button class="filter-option" data-value="ЮАО">ЮАО</button>
-                <button class="filter-option" data-value="ЮЗАО">ЮЗАО</button>
-                <button class="filter-option" data-value="ЗАО">ЗАО</button>
-                <button class="filter-option" data-value="СЗАО">СЗАО</button>
-                <button class="filter-option" data-value="НАО">НАО</button>
-                <button class="filter-option" data-value="ТАО">ТАО</button>
+                <!-- Округа будут добавлены динамически -->
             </div>
-            <div class="district-section">
-                <h4>Районы ЦАО</h4>
-                <div class="filter-options" id="districts-cao">
-                    <button class="filter-option" data-value="Арбат">Арбат</button>
-                    <button class="filter-option" data-value="Басманный">Басманный</button>
-                    <button class="filter-option" data-value="Замоскворечье">Замоскворечье</button>
-                    <button class="filter-option" data-value="Красносельский">Красносельский</button>
-                    <button class="filter-option" data-value="Мещанский">Мещанский</button>
-                    <button class="filter-option" data-value="Пресненский">Пресненский</button>
-                    <button class="filter-option" data-value="Таганский">Таганский</button>
-                    <button class="filter-option" data-value="Тверской">Тверской</button>
-                    <button class="filter-option" data-value="Хамовники">Хамовники</button>
-                    <button class="filter-option" data-value="Якиманка">Якиманка</button>
-                </div>
-                <h4>Районы САО</h4>
-                <div class="filter-options" id="districts-sao">
-                    <button class="filter-option" data-value="Аэропорт">Аэропорт</button>
-                    <button class="filter-option" data-value="Беговой">Беговой</button>
-                    <button class="filter-option" data-value="Бескудниковский">Бескудниковский</button>
-                    <button class="filter-option" data-value="Войковский">Войковский</button>
-                    <button class="filter-option" data-value="Восточное Дегунино">Восточное Дегунино</button>
-                    <button class="filter-option" data-value="Головинский">Головинский</button>
-                    <button class="filter-option" data-value="Дмитровский">Дмитровский</button>
-                    <button class="filter-option" data-value="Западное Дегунино">Западное Дегунино</button>
-                    <button class="filter-option" data-value="Коптево">Коптево</button>
-                    <button class="filter-option" data-value="Левобережный">Левобережный</button>
-                    <button class="filter-option" data-value="Молжаниновский">Молжаниновский</button>
-                    <button class="filter-option" data-value="Савёловский">Савёловский</button>
-                    <button class="filter-option" data-value="Сокол">Сокол</button>
-                    <button class="filter-option" data-value="Тимирязевский">Тимирязевский</button>
-                    <button class="filter-option" data-value="Ховрино">Ховрино</button>
-                    <button class="filter-option" data-value="Хорошёвский">Хорошёвский</button>
-                </div>
-                <h4>Районы СВАО</h4>
-                <div class="filter-options" id="districts-svao">
-                    <button class="filter-option" data-value="Алексеевский">Алексеевский</button>
-                    <button class="filter-option" data-value="Алтуфьевский">Алтуфьевский</button>
-                    <button class="filter-option" data-value="Бабушкинский">Бабушкинский</button>
-                    <button class="filter-option" data-value="Бибирево">Бибирево</button>
-                    <button class="filter-option" data-value="Бутырский">Бутырский</button>
-                    <button class="filter-option" data-value="Лианозово">Лианозово</button>
-                    <button class="filter-option" data-value="Лосиноостровский">Лосиноостровский</button>
-                    <button class="filter-option" data-value="Марфино">Марфино</button>
-                    <button class="filter-option" data-value="Марьина роща">Марьина роща</button>
-                    <button class="filter-option" data-value="Останкинский">Останкинский</button>
-                    <button class="filter-option" data-value="Отрадное">Отрадное</button>
-                    <button class="filter-option" data-value="Ростокино">Ростокино</button>
-                    <button class="filter-option" data-value="Свиблово">Свиблово</button>
-                    <button class="filter-option" data-value="Северное Медведково">Северное Медведково</button>
-                    <button class="filter-option" data-value="Северный">Северный</button>
-                    <button class="filter-option" data-value="Южное Медведково">Южное Медведково</button>
-                    <button class="filter-option" data-value="Ярославский">Ярославский</button>
-                </div>
+        </div>
+        <div class="filter-group">
+            <h3>🏙️ Районы Москвы</h3>
+            <div id="areas-container">
+                <!-- Районы будут добавлены динамически -->
             </div>
         </div>
 
@@ -325,29 +278,110 @@
             });
         });
 
-        // Обработчики для округов (множественный выбор)
-        document.querySelectorAll('#districts .filter-option').forEach(btn => {
-            btn.addEventListener('click', function() {
-                this.classList.toggle('selected');
-                if (this.classList.contains('selected')) {
-                    filters.districts.push(this.dataset.value);
-                } else {
-                    filters.districts = filters.districts.filter(d => d !== this.dataset.value);
+        // Загрузка округов и районов из districts_mapping.json
+        fetch('districts_mapping.json')
+            .then(response => response.json())
+            .then(json => {
+                const districtsData = {};
+                const mos = json["Москва"];
+                if (mos && mos.districts) {
+                    Object.entries(mos.districts).forEach(([okrug, okrugData]) => {
+                        if (okrugData.areas && Object.values(okrugData.areas).length > 0) {
+                            districtsData[okrug] = Object.values(okrugData.areas);
+                        } else {
+                            districtsData[okrug] = [];
+                        }
+                    });
                 }
+                buildDistrictsUI(districtsData);
             });
-        });
 
-        // Обработчики для районов (множественный выбор)
-        document.querySelectorAll('.district-section .filter-option').forEach(btn => {
-            btn.addEventListener('click', function() {
-                this.classList.toggle('selected');
-                if (this.classList.contains('selected')) {
-                    filters.districts.push(this.dataset.value);
-                } else {
-                    filters.districts = filters.districts.filter(d => d !== this.dataset.value);
+        function buildDistrictsUI(districtsData) {
+            // Округа
+            const districtsDiv = document.getElementById('districts');
+            districtsDiv.innerHTML = '';
+            Object.keys(districtsData).forEach(okrug => {
+                // Контейнер для округа и кнопки "районы"
+                const okrugWrap = document.createElement('div');
+                okrugWrap.style.display = 'flex';
+                okrugWrap.style.alignItems = 'center';
+                okrugWrap.style.gap = '4px';
+                okrugWrap.style.marginBottom = '4px';
+
+                // Кнопка округа
+                const btn = document.createElement('button');
+                btn.className = 'filter-option okrug-btn';
+                btn.dataset.value = okrug;
+                btn.textContent = okrug;
+                btn.addEventListener('click', function() {
+                    this.classList.toggle('selected');
+                    if (this.classList.contains('selected')) {
+                        filters.districts.push(okrug);
+                    } else {
+                        filters.districts = filters.districts.filter(d => d !== okrug);
+                    }
+                });
+                okrugWrap.appendChild(btn);
+
+                // Кнопка раскрытия районов (если есть районы)
+                if (districtsData[okrug].length > 0) {
+                    const toggleAreasBtn = document.createElement('button');
+                    toggleAreasBtn.textContent = '▼';
+                    toggleAreasBtn.style.fontSize = '16px';
+                    toggleAreasBtn.style.padding = '4px 8px';
+                    toggleAreasBtn.style.border = '1px solid #ccc';
+                    toggleAreasBtn.style.background = '#f7f7f7';
+                    toggleAreasBtn.style.borderRadius = '6px';
+                    toggleAreasBtn.style.cursor = 'pointer';
+                    toggleAreasBtn.setAttribute('aria-label', 'Показать районы');
+                    toggleAreasBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const areaSection = document.getElementById('areas-section-' + okrug);
+                        if (areaSection) {
+                            areaSection.style.display = areaSection.style.display === 'none' ? 'block' : 'none';
+                        }
+                    });
+                    okrugWrap.appendChild(toggleAreasBtn);
+                }
+                districtsDiv.appendChild(okrugWrap);
+            });
+
+            // Районы
+            const areasContainer = document.getElementById('areas-container');
+            areasContainer.innerHTML = '';
+            Object.keys(districtsData).forEach(okrug => {
+                if (districtsData[okrug].length > 0) {
+                    const section = document.createElement('div');
+                    section.id = 'areas-section-' + okrug;
+                    section.style.marginBottom = '12px';
+                    section.style.display = 'none';
+                    const title = document.createElement('div');
+                    title.textContent = okrug;
+                    title.style.fontWeight = 'bold';
+                    title.style.margin = '8px 0 4px 0';
+                    section.appendChild(title);
+                    const areaList = document.createElement('div');
+                    areaList.className = 'filter-options';
+                    districtsData[okrug].forEach(area => {
+                        const areaBtn = document.createElement('button');
+                        areaBtn.className = 'filter-option area-btn';
+                        areaBtn.dataset.value = area;
+                        areaBtn.textContent = area;
+                        areaBtn.addEventListener('click', function() {
+                            this.classList.toggle('selected');
+                            if (this.classList.contains('selected')) {
+                                filters.districts.push(area);
+                            } else {
+                                filters.districts = filters.districts.filter(d => d !== area);
+                            }
+                        });
+                        areaList.appendChild(areaBtn);
+                    });
+                    section.appendChild(areaList);
+                    areasContainer.appendChild(section);
                 }
             });
-        });
+        }
 
         // Обработчики для транспорта до метро (один выбор)
         document.querySelectorAll('#metro-transport .filter-option').forEach(btn => {
