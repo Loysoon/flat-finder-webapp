@@ -16,6 +16,8 @@
         .container {
             max-width: 400px;
             margin: 0 auto;
+            width: 100vw;
+            box-sizing: border-box;
         }
         .filter-group {
             margin-bottom: 20px;
@@ -28,6 +30,7 @@
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
+            width: 100%;
         }
         .filter-option {
             padding: 8px 16px;
@@ -37,6 +40,9 @@
             color: var(--tg-theme-button-color, #2481cc);
             cursor: pointer;
             transition: all 0.2s;
+            flex: 1 1 40%;
+            min-width: 100px;
+            max-width: 100%;
         }
         .filter-option.selected {
             background: var(--tg-theme-button-color, #2481cc);
@@ -45,6 +51,7 @@
         .price-inputs, .metro-inputs, .area-inputs, .floor-inputs {
             display: flex;
             gap: 10px;
+            width: 100%;
         }
         .price-inputs input, .metro-inputs input, .area-inputs input, .floor-inputs input {
             flex: 1;
@@ -53,6 +60,7 @@
             border-radius: 8px;
             background: var(--tg-theme-bg-color, #ffffff);
             color: var(--tg-theme-text-color, #000000);
+            min-width: 0;
         }
         .checkbox-group {
             display: flex;
@@ -77,6 +85,8 @@
             cursor: pointer;
             transition: all 0.2s;
             margin-bottom: 8px;
+            width: 100%;
+            box-sizing: border-box;
         }
         .toggle-option.selected {
             background: var(--tg-theme-button-color, #2481cc);
@@ -105,6 +115,18 @@
         }
         .save-btn:hover {
             opacity: 0.9;
+        }
+        .floor-inputs {
+            margin-bottom: 10px;
+        }
+        #not-last-floor {
+            margin-top: 8px;
+            width: 100%;
+            display: block;
+        }
+        html, body {
+            max-width: 100vw;
+            overflow-x: hidden;
         }
     </style>
 </head>
@@ -256,6 +278,16 @@
         </div>
 
         <button class="save-btn" onclick="saveFilters()">✅ Сохранить настройки</button>
+        <button class="save-btn" style="background:#e74c3c; margin-top:10px;" onclick="showResetModal()">🗑️ Сбросить фильтры</button>
+
+        <!-- Модальное окно подтверждения сброса -->
+        <div id="reset-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.3); z-index:1000; align-items:center; justify-content:center;">
+            <div style="background:#fff; color:#222; border-radius:12px; max-width:320px; width:90vw; padding:24px 16px 16px 16px; position:relative; box-shadow:0 4px 24px rgba(0,0,0,0.15);">
+                <button onclick="closeResetModal()" style="position:absolute; top:4px; right:4px; background:none; border:none; font-size:32px; color:#888; cursor:pointer; width:44px; height:44px; display:flex; align-items:center; justify-content:center;">&times;</button>
+                <div style="font-size:18px; font-weight:500; margin-bottom:16px; text-align:center;">Вы уверены, что хотите сбросить фильтры?</div>
+                <button class="save-btn" style="background:#e74c3c; margin:0 auto; display:block;" onclick="confirmResetFilters()">Сбросить</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -390,6 +422,43 @@
             // Отправляем данные в Telegram
             tg.sendData(JSON.stringify(filters));
             tg.close();
+        }
+
+        // Сброс фильтров
+        function resetFilters() {
+            // Сбросить все значения фильтров
+            filters = {
+                rooms: [],
+                priceMin: null,
+                priceMax: null,
+                ownerOnly: false,
+                metroTime: null,
+                metroTransport: null,
+                districts: [],
+                amenities: [],
+                withChildren: false,
+                withPets: false,
+                areaMin: null,
+                floorMin: null,
+                floorMax: null,
+                notLastFloor: false
+            };
+            // Снять выделение со всех кнопок
+            document.querySelectorAll('.filter-option, .toggle-option').forEach(btn => btn.classList.remove('selected'));
+            // Очистить все input
+            document.querySelectorAll('input[type="number"]').forEach(inp => inp.value = '');
+        }
+
+        // Модальное окно сброса фильтров
+        function showResetModal() {
+            document.getElementById('reset-modal').style.display = 'flex';
+        }
+        function closeResetModal() {
+            document.getElementById('reset-modal').style.display = 'none';
+        }
+        function confirmResetFilters() {
+            resetFilters();
+            closeResetModal();
         }
     </script>
 </body>
