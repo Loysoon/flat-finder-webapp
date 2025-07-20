@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flat Finder - Настройки фильтров</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #000000);
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        .filter-group {
+            margin-bottom: 20px;
+        }
+        .filter-group h3 {
+            margin-bottom: 10px;
+            color: var(--tg-theme-text-color, #000000);
+        }
+        .filter-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .filter-option {
+            padding: 8px 16px;
+            border: 1px solid var(--tg-theme-button-color, #2481cc);
+            border-radius: 8px;
+            background: transparent;
+            color: var(--tg-theme-button-color, #2481cc);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .filter-option.selected {
+            background: var(--tg-theme-button-color, #2481cc);
+            color: var(--tg-theme-button-text-color, #ffffff);
+        }
+        .price-inputs, .metro-inputs, .area-inputs, .floor-inputs {
+            display: flex;
+            gap: 10px;
+        }
+        .price-inputs input, .metro-inputs input, .area-inputs input, .floor-inputs input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid var(--tg-theme-hint-color, #999999);
+            border-radius: 8px;
+            background: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #000000);
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--tg-theme-button-color, #2481cc);
+        }
+        .checkbox-group label {
+            cursor: pointer;
+        }
+        .toggle-option {
+            padding: 8px 16px;
+            border: 1px solid var(--tg-theme-button-color, #2481cc);
+            border-radius: 8px;
+            background: transparent;
+            color: var(--tg-theme-button-color, #2481cc);
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 8px;
+        }
+        .toggle-option.selected {
+            background: var(--tg-theme-button-color, #2481cc);
+            color: var(--tg-theme-button-text-color, #ffffff);
+        }
+        .district-section {
+            margin-top: 10px;
+            padding-left: 15px;
+            border-left: 2px solid var(--tg-theme-hint-color, #999999);
+        }
+        .district-section h4 {
+            margin: 10px 0 5px 0;
+            font-size: 14px;
+            color: var(--tg-theme-hint-color, #999999);
+        }
+        .save-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--tg-theme-button-color, #2481cc);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .save-btn:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🔧 Настройки фильтров</h2>
+        
+        <div class="filter-group">
+            <h3>🏠 Количество комнат</h3>
+            <div class="filter-options" id="rooms">
+                <button class="filter-option" data-value="studio">Студия</button>
+                <button class="filter-option" data-value="1">1</button>
+                <button class="filter-option" data-value="2">2</button>
+                <button class="filter-option" data-value="3">3</button>
+                <button class="filter-option" data-value="4">4</button>
+                <button class="filter-option" data-value="5">5</button>
+                <button class="filter-option" data-value="6">6</button>
+                <button class="filter-option" data-value="free">Свободная планировка</button>
+            </div>
+        </div>
+
+        <div class="filter-group">
+            <h3>💰 Ценовой диапазон</h3>
+            <div class="price-inputs">
+                <input type="number" id="price-min" placeholder="От (руб.)">
+                <input type="number" id="price-max" placeholder="До (руб.)">
+            </div>
+        </div>
+
+        <div class="filter-group">
+            <h3>👤 Собственник</h3>
+            <button class="toggle-option" id="owner-only" data-value="owner">👤 Только собственник</button>
+        </div>
+
+        <div class="filter-group">
+            <h3>🚇 Время до метро</h3>
+            <div class="metro-inputs">
+                <input type="number" id="metro-time" placeholder="Время (мин)">
+                <div class="filter-options" id="metro-transport">
+                    <button class="filter-option" data-value="walk">🚶 Пешком</button>
+                    <button class="filter-option" data-value="transport">🚌 Транспорт</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-group">
+            <h3>📍 Округа и районы Москвы</h3>
+            <div class="filter-options" id="districts">
+                <button class="filter-option" data-value="ЦАО">ЦАО</button>
+                <button class="filter-option" data-value="САО">САО</button>
+                <button class="filter-option" data-value="СВАО">СВАО</button>
+                <button class="filter-option" data-value="ВАО">ВАО</button>
+                <button class="filter-option" data-value="ЮВАО">ЮВАО</button>
+                <button class="filter-option" data-value="ЮАО">ЮАО</button>
+                <button class="filter-option" data-value="ЮЗАО">ЮЗАО</button>
+                <button class="filter-option" data-value="ЗАО">ЗАО</button>
+                <button class="filter-option" data-value="СЗАО">СЗАО</button>
+                <button class="filter-option" data-value="НАО">НАО</button>
+                <button class="filter-option" data-value="ТАО">ТАО</button>
+            </div>
+            <div class="district-section">
+                <h4>Районы ЦАО</h4>
+                <div class="filter-options" id="districts-cao">
+                    <button class="filter-option" data-value="Арбат">Арбат</button>
+                    <button class="filter-option" data-value="Басманный">Басманный</button>
+                    <button class="filter-option" data-value="Замоскворечье">Замоскворечье</button>
+                    <button class="filter-option" data-value="Красносельский">Красносельский</button>
+                    <button class="filter-option" data-value="Мещанский">Мещанский</button>
+                    <button class="filter-option" data-value="Пресненский">Пресненский</button>
+                    <button class="filter-option" data-value="Таганский">Таганский</button>
+                    <button class="filter-option" data-value="Тверской">Тверской</button>
+                    <button class="filter-option" data-value="Хамовники">Хамовники</button>
+                    <button class="filter-option" data-value="Якиманка">Якиманка</button>
+                </div>
+                <h4>Районы САО</h4>
+                <div class="filter-options" id="districts-sao">
+                    <button class="filter-option" data-value="Аэропорт">Аэропорт</button>
+                    <button class="filter-option" data-value="Беговой">Беговой</button>
+                    <button class="filter-option" data-value="Бескудниковский">Бескудниковский</button>
+                    <button class="filter-option" data-value="Войковский">Войковский</button>
+                    <button class="filter-option" data-value="Восточное Дегунино">Восточное Дегунино</button>
+                    <button class="filter-option" data-value="Головинский">Головинский</button>
+                    <button class="filter-option" data-value="Дмитровский">Дмитровский</button>
+                    <button class="filter-option" data-value="Западное Дегунино">Западное Дегунино</button>
+                    <button class="filter-option" data-value="Коптево">Коптево</button>
+                    <button class="filter-option" data-value="Левобережный">Левобережный</button>
+                    <button class="filter-option" data-value="Молжаниновский">Молжаниновский</button>
+                    <button class="filter-option" data-value="Савёловский">Савёловский</button>
+                    <button class="filter-option" data-value="Сокол">Сокол</button>
+                    <button class="filter-option" data-value="Тимирязевский">Тимирязевский</button>
+                    <button class="filter-option" data-value="Ховрино">Ховрино</button>
+                    <button class="filter-option" data-value="Хорошёвский">Хорошёвский</button>
+                </div>
+                <h4>Районы СВАО</h4>
+                <div class="filter-options" id="districts-svao">
+                    <button class="filter-option" data-value="Алексеевский">Алексеевский</button>
+                    <button class="filter-option" data-value="Алтуфьевский">Алтуфьевский</button>
+                    <button class="filter-option" data-value="Бабушкинский">Бабушкинский</button>
+                    <button class="filter-option" data-value="Бибирево">Бибирево</button>
+                    <button class="filter-option" data-value="Бутырский">Бутырский</button>
+                    <button class="filter-option" data-value="Лианозово">Лианозово</button>
+                    <button class="filter-option" data-value="Лосиноостровский">Лосиноостровский</button>
+                    <button class="filter-option" data-value="Марфино">Марфино</button>
+                    <button class="filter-option" data-value="Марьина роща">Марьина роща</button>
+                    <button class="filter-option" data-value="Останкинский">Останкинский</button>
+                    <button class="filter-option" data-value="Отрадное">Отрадное</button>
+                    <button class="filter-option" data-value="Ростокино">Ростокино</button>
+                    <button class="filter-option" data-value="Свиблово">Свиблово</button>
+                    <button class="filter-option" data-value="Северное Медведково">Северное Медведково</button>
+                    <button class="filter-option" data-value="Северный">Северный</button>
+                    <button class="filter-option" data-value="Южное Медведково">Южное Медведково</button>
+                    <button class="filter-option" data-value="Ярославский">Ярославский</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-group">
+            <h3>🛋 Удобства</h3>
+            <div class="filter-options" id="amenities">
+                <button class="filter-option" data-value="conditioner">🌡️ Кондиционер</button>
+                <button class="filter-option" data-value="rfgr">🧊 Холодильник</button>
+                <button class="filter-option" data-value="dishwasher">🍽️ Посудомойка</button>
+                <button class="filter-option" data-value="wm">👕 Стиралка</button>
+                <button class="filter-option" data-value="internet">🌐 Интернет</button>
+                <button class="filter-option" data-value="tv">📺 Телевизор</button>
+            </div>
+        </div>
+
+        <div class="filter-group">
+            <h3>👨‍👩‍👧‍👦 Условия проживания</h3>
+            <button class="toggle-option" id="with-children" data-value="children">👶 Можно с детьми</button>
+            <button class="toggle-option" id="with-pets" data-value="pets">🐕 Можно с животными</button>
+        </div>
+
+        <div class="filter-group">
+            <h3>📐 Площадь</h3>
+            <div class="area-inputs">
+                <input type="number" id="area-min" placeholder="От (м²)">
+            </div>
+        </div>
+
+        <div class="filter-group">
+            <h3>🏢 Этаж</h3>
+            <div class="floor-inputs">
+                <input type="number" id="floor-min" placeholder="От">
+                <input type="number" id="floor-max" placeholder="До">
+            </div>
+            <button class="toggle-option" id="not-last-floor" data-value="not-last-floor">🏢 Не последний этаж</button>
+        </div>
+
+        <button class="save-btn" onclick="saveFilters()">✅ Сохранить настройки</button>
+    </div>
+
+    <script>
+        // Инициализация Telegram Web App
+        let tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+
+        // Данные фильтров
+        let filters = {
+            rooms: [],
+            priceMin: null,
+            priceMax: null,
+            ownerOnly: false,
+            metroTime: null,
+            metroTransport: null,
+            districts: [],
+            amenities: [],
+            withChildren: false,
+            withPets: false,
+            areaMin: null,
+            floorMin: null,
+            floorMax: null,
+            notLastFloor: false
+        };
+
+        // Обработчики для кнопок комнат (множественный выбор)
+        document.querySelectorAll('#rooms .filter-option').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.classList.toggle('selected');
+                if (this.classList.contains('selected')) {
+                    filters.rooms.push(this.dataset.value);
+                } else {
+                    filters.rooms = filters.rooms.filter(r => r !== this.dataset.value);
+                }
+            });
+        });
+
+        // Обработчики для округов (множественный выбор)
+        document.querySelectorAll('#districts .filter-option').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.classList.toggle('selected');
+                if (this.classList.contains('selected')) {
+                    filters.districts.push(this.dataset.value);
+                } else {
+                    filters.districts = filters.districts.filter(d => d !== this.dataset.value);
+                }
+            });
+        });
+
+        // Обработчики для районов (множественный выбор)
+        document.querySelectorAll('.district-section .filter-option').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.classList.toggle('selected');
+                if (this.classList.contains('selected')) {
+                    filters.districts.push(this.dataset.value);
+                } else {
+                    filters.districts = filters.districts.filter(d => d !== this.dataset.value);
+                }
+            });
+        });
+
+        // Обработчики для транспорта до метро (один выбор)
+        document.querySelectorAll('#metro-transport .filter-option').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('#metro-transport .filter-option').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+                filters.metroTransport = this.dataset.value;
+            });
+        });
+
+        // Обработчики для удобств (множественный выбор)
+        document.querySelectorAll('#amenities .filter-option').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.classList.toggle('selected');
+                if (this.classList.contains('selected')) {
+                    filters.amenities.push(this.dataset.value);
+                } else {
+                    filters.amenities = filters.amenities.filter(a => a !== this.dataset.value);
+                }
+            });
+        });
+
+        // Обработчики для полей ввода
+        document.getElementById('price-min').addEventListener('input', function() {
+            filters.priceMin = this.value;
+        });
+
+        document.getElementById('price-max').addEventListener('input', function() {
+            filters.priceMax = this.value;
+        });
+
+        document.getElementById('metro-time').addEventListener('input', function() {
+            filters.metroTime = this.value;
+        });
+
+        document.getElementById('area-min').addEventListener('input', function() {
+            filters.areaMin = this.value;
+        });
+
+        document.getElementById('floor-min').addEventListener('input', function() {
+            filters.floorMin = this.value;
+        });
+
+        document.getElementById('floor-max').addEventListener('input', function() {
+            filters.floorMax = this.value;
+        });
+
+        // Обработчики для кнопок-переключателей
+        document.getElementById('owner-only').addEventListener('click', function() {
+            this.classList.toggle('selected');
+            filters.ownerOnly = this.classList.contains('selected');
+        });
+
+        document.getElementById('with-children').addEventListener('click', function() {
+            this.classList.toggle('selected');
+            filters.withChildren = this.classList.contains('selected');
+        });
+
+        document.getElementById('with-pets').addEventListener('click', function() {
+            this.classList.toggle('selected');
+            filters.withPets = this.classList.contains('selected');
+        });
+
+        document.getElementById('not-last-floor').addEventListener('click', function() {
+            this.classList.toggle('selected');
+            filters.notLastFloor = this.classList.contains('selected');
+        });
+
+        // Сохранение фильтров
+        function saveFilters() {
+            // Отправляем данные в Telegram
+            tg.sendData(JSON.stringify(filters));
+            tg.close();
+        }
+    </script>
+</body>
+</html> 
