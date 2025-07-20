@@ -184,8 +184,8 @@
 
         <div class="filter-group">
             <h3>📍 Округа Москвы</h3>
-            <div class="filter-options" id="districts">
-                <!-- Округа будут добавлены динамически -->
+            <div id="districts-list">
+                <!-- Округа и кнопки районов будут добавлены динамически -->
             </div>
         </div>
         <div class="filter-group">
@@ -297,23 +297,24 @@
             });
 
         function buildDistrictsUI(districtsData) {
-            // Округа
-            const districtsDiv = document.getElementById('districts');
-            districtsDiv.innerHTML = '';
+            // Округа и кнопки районов
+            const districtsList = document.getElementById('districts-list');
+            districtsList.innerHTML = '';
+            const areasContainer = document.getElementById('areas-container');
+            areasContainer.innerHTML = '';
             Object.keys(districtsData).forEach(okrug => {
-                // Контейнер для округа и кнопки "районы"
-                const okrugWrap = document.createElement('div');
-                okrugWrap.style.display = 'flex';
-                okrugWrap.style.alignItems = 'center';
-                okrugWrap.style.gap = '4px';
-                okrugWrap.style.marginBottom = '4px';
+                // Контейнер для блока округа
+                const okrugBlock = document.createElement('div');
+                okrugBlock.style.marginBottom = '12px';
+                okrugBlock.style.width = '100%';
 
                 // Кнопка округа
-                const btn = document.createElement('button');
-                btn.className = 'filter-option okrug-btn';
-                btn.dataset.value = okrug;
-                btn.textContent = okrug;
-                btn.addEventListener('click', function() {
+                const okrugBtn = document.createElement('button');
+                okrugBtn.className = 'filter-option okrug-btn';
+                okrugBtn.dataset.value = okrug;
+                okrugBtn.textContent = okrug;
+                okrugBtn.style.width = '100%';
+                okrugBtn.addEventListener('click', function() {
                     this.classList.toggle('selected');
                     if (this.classList.contains('selected')) {
                         filters.districts.push(okrug);
@@ -321,34 +322,28 @@
                         filters.districts = filters.districts.filter(d => d !== okrug);
                     }
                 });
-                okrugWrap.appendChild(btn);
+                okrugBlock.appendChild(okrugBtn);
 
-                // Кнопка раскрытия районов (если есть районы)
+                // Кнопка "Районы" (если есть районы)
                 if (districtsData[okrug].length > 0) {
-                    const toggleAreasBtn = document.createElement('button');
-                    toggleAreasBtn.textContent = '▼';
-                    toggleAreasBtn.style.fontSize = '16px';
-                    toggleAreasBtn.style.padding = '4px 8px';
-                    toggleAreasBtn.style.border = '1px solid #ccc';
-                    toggleAreasBtn.style.background = '#f7f7f7';
-                    toggleAreasBtn.style.borderRadius = '6px';
-                    toggleAreasBtn.style.cursor = 'pointer';
-                    toggleAreasBtn.setAttribute('aria-label', 'Показать районы');
-                    toggleAreasBtn.addEventListener('click', function(e) {
+                    const areasBtn = document.createElement('button');
+                    areasBtn.className = 'filter-option';
+                    areasBtn.textContent = 'Районы';
+                    areasBtn.style.width = '100%';
+                    areasBtn.style.marginTop = '4px';
+                    areasBtn.addEventListener('click', function(e) {
                         e.stopPropagation();
                         const areaSection = document.getElementById('areas-section-' + okrug);
                         if (areaSection) {
                             areaSection.style.display = areaSection.style.display === 'none' ? 'block' : 'none';
                         }
                     });
-                    okrugWrap.appendChild(toggleAreasBtn);
+                    okrugBlock.appendChild(areasBtn);
                 }
-                districtsDiv.appendChild(okrugWrap);
+                districtsList.appendChild(okrugBlock);
             });
 
-            // Районы
-            const areasContainer = document.getElementById('areas-container');
-            areasContainer.innerHTML = '';
+            // Районы (секции скрыты по умолчанию)
             Object.keys(districtsData).forEach(okrug => {
                 if (districtsData[okrug].length > 0) {
                     const section = document.createElement('div');
