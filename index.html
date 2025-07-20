@@ -153,6 +153,7 @@
             align-items: stretch;
             box-sizing: border-box;
             overflow: hidden;
+            position: relative;
         }
         .okrug-btn {
             flex: 1 1 0;
@@ -222,17 +223,18 @@
         .okrug-btn--single {
             border-radius: 10px;
             border-right: 1px solid var(--tg-theme-button-color, #2481cc);
+            width: 100%;
         }
         .areas-toggle--empty {
-            flex: 0 0 80px;
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
             width: 80px;
-            min-width: 0;
-            max-width: 80px;
-            height: 44px;
             background: transparent;
             border: none;
-            box-sizing: border-box;
             pointer-events: none;
+            box-sizing: border-box;
         }
     </style>
 </head>
