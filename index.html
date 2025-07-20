@@ -142,28 +142,40 @@
             width: 100%;
             margin-bottom: 18px;
             position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        .okrug-row {
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+            gap: 0;
         }
         .okrug-btn {
-            width: 100%;
+            flex: 1 1 0;
             margin-bottom: 0;
+            border-radius: 10px 0 0 10px;
+            border-right: none;
         }
         .areas-toggle {
-            display: flex;
-            align-items: center;
-            justify-content: center;
             min-width: 80px;
-            max-width: 70%;
-            margin: 6px auto 0 auto;
-            height: 28px;
+            max-width: 120px;
+            width: auto;
+            margin: 0;
+            height: 100%;
             font-size: 15px;
             background: transparent;
-            border: none;
-            border-radius: 0 0 10px 10px;
+            border: 1px solid #2481cc;
+            border-left: none;
+            border-radius: 0 10px 10px 0;
             color: #2481cc;
             cursor: pointer;
             position: relative;
             z-index: 2;
             transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .areas-toggle:hover {
             background: rgba(36,129,204,0.07);
@@ -345,6 +357,10 @@
                 const okrugBlock = document.createElement('div');
                 okrugBlock.className = 'okrug-block';
 
+                // Строка с кнопками округа и районов
+                const okrugRow = document.createElement('div');
+                okrugRow.className = 'okrug-row';
+
                 // Кнопка округа
                 const okrugBtn = document.createElement('button');
                 okrugBtn.className = 'filter-option okrug-btn';
@@ -358,7 +374,7 @@
                         filters.districts = filters.districts.filter(d => d !== okrug);
                     }
                 });
-                okrugBlock.appendChild(okrugBtn);
+                okrugRow.appendChild(okrugBtn);
 
                 // Ярлычок-кнопка "Районы"
                 let areasSection = null;
@@ -380,7 +396,7 @@
                             }
                         }
                     });
-                    okrugBlock.appendChild(areasToggle);
+                    okrugRow.appendChild(areasToggle);
 
                     // Секция районов (внутри блока округа)
                     areasSection = document.createElement('div');
@@ -405,7 +421,10 @@
                     });
                     areasSection.appendChild(areaList);
                     okrugBlock.appendChild(areasSection);
+                } else {
+                    okrugRow.appendChild(okrugBtn);
                 }
+                okrugBlock.appendChild(okrugRow);
                 districtsList.appendChild(okrugBlock);
             });
         }
