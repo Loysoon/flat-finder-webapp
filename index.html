@@ -154,26 +154,28 @@
         }
         .okrug-btn {
             flex: 1 1 0;
+            min-width: 80px;
             margin-bottom: 0;
             border-radius: 10px 0 0 10px;
             border-right: none;
             height: 44px;
             font-size: 16px;
             padding: 8px 0;
+            box-sizing: border-box;
         }
         .areas-toggle {
+            width: 100px;
             min-width: 80px;
             max-width: 120px;
-            width: auto;
             margin: 0;
             height: 44px;
             font-size: 16px;
             padding: 8px 0;
-            background: transparent;
-            border: 1px solid #2481cc;
+            background: var(--tg-theme-bg-color, #ffffff);
+            border: 1px solid var(--tg-theme-button-color, #2481cc);
             border-left: none;
             border-radius: 0 10px 10px 0;
-            color: #2481cc;
+            color: var(--tg-theme-button-color, #2481cc);
             cursor: pointer;
             position: relative;
             z-index: 2;
@@ -181,6 +183,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            box-sizing: border-box;
         }
         .areas-toggle:hover {
             background: rgba(36,129,204,0.07);
@@ -190,7 +193,7 @@
             background: transparent;
             border-radius: 0 0 10px 10px;
             box-shadow: none;
-            margin-top: 0;
+            margin-top: 8px;
             padding-bottom: 8px;
             overflow: hidden;
             max-height: 0;
@@ -201,6 +204,15 @@
             max-height: 500px;
             opacity: 1;
             transition: max-height 0.5s cubic-bezier(.4,0,.2,1), opacity 0.3s;
+        }
+        .areas-toggle {
+            background: var(--tg-theme-bg-color, #ffffff);
+            border: 1px solid var(--tg-theme-button-color, #2481cc);
+            color: var(--tg-theme-button-color, #2481cc);
+        }
+        .areas-toggle.selected, .areas-toggle:active {
+            background: var(--tg-theme-button-color, #2481cc);
+            color: var(--tg-theme-button-text-color, #ffffff);
         }
     </style>
 </head>
