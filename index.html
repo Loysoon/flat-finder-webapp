@@ -219,6 +219,11 @@
             background: var(--tg-theme-button-color, #2481cc);
             color: var(--tg-theme-button-text-color, #ffffff);
         }
+        .okrug-btn--single {
+            border-radius: 10px;
+            border-right: 1px solid var(--tg-theme-button-color, #2481cc);
+            width: 100%;
+        }
     </style>
 </head>
 <body>
@@ -388,6 +393,9 @@
                 okrugBtn.className = 'filter-option okrug-btn';
                 okrugBtn.dataset.value = okrug;
                 okrugBtn.textContent = okrug;
+                if (districtsData[okrug].length === 0) {
+                    okrugBtn.classList.add('okrug-btn--single');
+                }
                 okrugBtn.addEventListener('click', function() {
                     this.classList.toggle('selected');
                     if (this.classList.contains('selected')) {
