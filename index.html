@@ -150,20 +150,25 @@
             flex-direction: row;
             width: 100%;
             gap: 0;
+            align-items: stretch;
         }
         .okrug-btn {
             flex: 1 1 0;
             margin-bottom: 0;
             border-radius: 10px 0 0 10px;
             border-right: none;
+            height: 44px;
+            font-size: 16px;
+            padding: 8px 0;
         }
         .areas-toggle {
             min-width: 80px;
             max-width: 120px;
             width: auto;
             margin: 0;
-            height: 100%;
-            font-size: 15px;
+            height: 44px;
+            font-size: 16px;
+            padding: 8px 0;
             background: transparent;
             border: 1px solid #2481cc;
             border-left: none;
@@ -374,7 +379,6 @@
                         filters.districts = filters.districts.filter(d => d !== okrug);
                     }
                 });
-                okrugRow.appendChild(okrugBtn);
 
                 // Ярлычок-кнопка "Районы"
                 let areasSection = null;
@@ -396,9 +400,15 @@
                             }
                         }
                     });
+                    okrugRow.appendChild(okrugBtn);
                     okrugRow.appendChild(areasToggle);
+                } else {
+                    okrugRow.appendChild(okrugBtn);
+                }
+                okrugBlock.appendChild(okrugRow);
 
-                    // Секция районов (внутри блока округа)
+                // Секция районов (внутри блока округа, строго после строки с кнопками)
+                if (districtsData[okrug].length > 0) {
                     areasSection = document.createElement('div');
                     areasSection.id = 'areas-section-' + okrug;
                     areasSection.className = 'areas-list-section';
@@ -421,10 +431,7 @@
                     });
                     areasSection.appendChild(areaList);
                     okrugBlock.appendChild(areasSection);
-                } else {
-                    okrugRow.appendChild(okrugBtn);
                 }
-                okrugBlock.appendChild(okrugRow);
                 districtsList.appendChild(okrugBlock);
             });
         }
