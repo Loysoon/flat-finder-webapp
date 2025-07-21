@@ -275,11 +275,22 @@
             font-weight: bold;
             margin-left: 5px;
         }
-        .area-highlight {
-            background: #ffe066 !important;
-            color: #222 !important;
-            box-shadow: 0 0 0 2px #ffd700;
-            transition: background 0.3s;
+        /* CSS для поля поиска района */
+        .styled-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--tg-theme-hint-color, #999999);
+            border-radius: 8px;
+            background: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #000000);
+            font-size: 16px;
+            box-sizing: border-box;
+            outline: none;
+            margin-bottom: 0;
+            transition: border-color 0.2s;
+        }
+        .styled-input:focus {
+            border-color: var(--tg-theme-button-color, #2481cc);
         }
     </style>
 </head>
@@ -336,14 +347,11 @@
         </div>
 
         <div class="filter-group">
-            <h3 style="display: flex; align-items: center; gap: 12px;">
-                📍 Округа Москвы
-                <div style="flex:1"></div>
-                <div style="position:relative; min-width:180px;">
-                    <input id="area-search" type="text" placeholder="Поиск района..." style="padding:6px 12px; border-radius:8px; border:1px solid #ccc; width:180px;">
-                    <div id="area-suggest" style="position:absolute; left:0; right:0; top:36px; background:#fff; z-index:10; border-radius:0 0 8px 8px; box-shadow:0 2px 8px rgba(0,0,0,0.08); display:none;"></div>
-                </div>
-            </h3>
+            <h3>📍 Округа Москвы</h3>
+            <div style="margin-bottom: 12px; position:relative;">
+                <input id="area-search" type="text" placeholder="Поиск района..." class="styled-input" autocomplete="off">
+                <div id="area-suggest" style="position:absolute; left:0; right:0; top:38px; background:var(--tg-theme-bg-color,#fff); z-index:10; border-radius:0 0 8px 8px; box-shadow:0 2px 8px rgba(0,0,0,0.08); display:none;"></div>
+            </div>
             <div id="districts-list">
                 <!-- Округа и ярлычки районов будут добавлены динамически -->
             </div>
@@ -626,6 +634,7 @@
                 });
             });
         }
+        // вызывать после buildDistrictsUI
         updateAllAreasList();
 
         const areaSearchInput = document.getElementById('area-search');
@@ -651,7 +660,6 @@
                     e.preventDefault();
                     areaSearchInput.value = '';
                     areaSuggest.style.display = 'none';
-                    // Развернуть округ и подсветить район
                     openOkrugAndHighlightArea(okrug, area);
                 });
                 areaSuggest.appendChild(item);
