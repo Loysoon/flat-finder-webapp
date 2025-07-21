@@ -622,6 +622,7 @@
                 okrugBlock.appendChild(okrugRow);
                 districtsList.appendChild(okrugBlock);
             });
+            updateAllAreasList();
         }
 
         // --- Поиск по районам ---
@@ -648,7 +649,12 @@
             }
             const found = allAreasList.filter(a => a.area.toLowerCase().includes(val));
             if (found.length === 0) {
-                areaSuggest.style.display = 'none';
+                const item = document.createElement('div');
+                item.textContent = 'Ничего не найдено';
+                item.style.padding = '6px 12px';
+                item.style.color = '#888';
+                areaSuggest.appendChild(item);
+                areaSuggest.style.display = 'block';
                 return;
             }
             found.slice(0, 7).forEach(({ area, okrug }) => {
