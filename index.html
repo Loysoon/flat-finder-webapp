@@ -712,11 +712,10 @@
                             blink();
                         }
                     }
-                    // Всегда вызываем сразу
-                    scrollAndBlink();
-                    // Если был закрыт — повторяем через 150 мс
                     if (wasClosed) {
                         setTimeout(scrollAndBlink, 150);
+                    } else {
+                        scrollAndBlink();
                     }
                 }
             });
