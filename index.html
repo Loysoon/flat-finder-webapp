@@ -450,6 +450,12 @@
                 if (districtsData[okrug].length === 0) {
                     okrugBtn.classList.add('okrug-btn--single');
                 }
+                // span для количества выбранных районов
+                const countSpan = document.createElement('span');
+                countSpan.className = 'area-count';
+                okrugBtn.appendChild(countSpan);
+
+                let areaBtns = [];
                 okrugBtn.addEventListener('click', function() {
                     const allSelected = districtsData[okrug].every(area => filters.districts.includes(area));
                     if (allSelected) {
@@ -468,11 +474,11 @@
                         areaBtns.forEach(btn => btn.classList.add('selected'));
                     }
                     updateOkrugBtn();
+                    updateAreaCount();
                 });
 
                 // Ярлычок-кнопка "Районы"
                 let areasSection = null;
-                let areaBtns = [];
                 if (districtsData[okrug].length > 0) {
                     const areasToggle = document.createElement('button');
                     areasToggle.className = 'areas-toggle';
@@ -528,6 +534,7 @@
                             } else {
                                 okrugBtn.classList.remove('selected');
                             }
+                            updateAreaCount();
                         });
                         areaBtns.push(areaBtn);
                         areaList.appendChild(areaBtn);
@@ -536,7 +543,7 @@
                     okrugBlock.appendChild(areasSection);
                 }
                 districtsList.appendChild(okrugBlock);
-                // Функция для обновления состояния кнопки округа
+                // Функция для обновления состояния кнопки округа и количества выбранных районов
                 function updateOkrugBtn() {
                     const allSelected = districtsData[okrug].every(area => filters.districts.includes(area));
                     if (allSelected) {
@@ -552,7 +559,22 @@
                         }
                     });
                 }
+                function getAreaCountText(n) {
+                    if (n === 1) return 'Выбран 1 район';
+                    if (n >= 2 && n <= 4) return `Выбрано ${n} района`;
+                    return `Выбрано ${n} районов`;
+                }
+                function updateAreaCount() {
+                    const selectedCount = districtsData[okrug].filter(area => filters.districts.includes(area)).length;
+                    const total = districtsData[okrug].length;
+                    if (selectedCount > 0 && selectedCount < total) {
+                        countSpan.textContent = ` (${getAreaCountText(selectedCount)})`;
+                    } else {
+                        countSpan.textContent = '';
+                    }
+                }
                 updateOkrugBtn();
+                updateAreaCount();
             });
         }
 
