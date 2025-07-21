@@ -449,6 +449,15 @@
                 okrugBtn.textContent = okrug;
                 if (districtsData[okrug].length === 0) {
                     okrugBtn.classList.add('okrug-btn--single');
+                    okrugBtn.addEventListener('click', function() {
+                        if (filters.districts.includes(okrug)) {
+                            filters.districts = filters.districts.filter(a => a !== okrug);
+                            okrugBtn.classList.remove('selected');
+                        } else {
+                            filters.districts.push(okrug);
+                            okrugBtn.classList.add('selected');
+                        }
+                    });
                 }
                 // span для количества выбранных районов
                 const countSpan = document.createElement('span');
