@@ -689,25 +689,33 @@
                 if (btn && btn.dataset.value === okrug) {
                     const areasToggle = block.querySelector('.areas-toggle');
                     const areasSection = block.querySelector('.areas-list-section');
+                    let wasClosed = false;
                     if (areasToggle && areasSection && !areasSection.classList.contains('open')) {
                         areasSection.classList.add('open');
                         areasToggle.innerHTML = 'Районы <span style="font-size:18px;">&#8593;</span>';
+                        wasClosed = true;
                     }
-                    // Мигание подсветки 3 раза по 0.5 секунды
-                    const areaBtn = areasSection.querySelector('.area-btn[data-value="' + area + '"]');
-                    if (areaBtn) {
-                        areaBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        let blinkCount = 0;
-                        function blink() {
-                            areaBtn.classList.toggle('area-highlight');
-                            blinkCount++;
-                            if (blinkCount < 6) {
-                                setTimeout(blink, 250);
-                            } else {
-                                areaBtn.classList.remove('area-highlight');
+                    function scrollAndBlink() {
+                        const areaBtn = areasSection.querySelector('.area-btn[data-value="' + area + '"]');
+                        if (areaBtn) {
+                            areaBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            let blinkCount = 0;
+                            function blink() {
+                                areaBtn.classList.toggle('area-highlight');
+                                blinkCount++;
+                                if (blinkCount < 6) {
+                                    setTimeout(blink, 250);
+                                } else {
+                                    areaBtn.classList.remove('area-highlight');
+                                }
                             }
+                            blink();
                         }
-                        blink();
+                    }
+                    if (wasClosed) {
+                        setTimeout(scrollAndBlink, 150);
+                    } else {
+                        scrollAndBlink();
                     }
                 }
             });
