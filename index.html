@@ -239,6 +239,35 @@
             pointer-events: none;
             box-sizing: border-box;
         }
+        .rooms-row-single {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .rooms-row-pair {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .room-btn-full {
+            width: 100%;
+            flex: 1 1 100%;
+        }
+        .room-btn-half {
+            width: 50%;
+            flex: 1 1 50%;
+        }
+        .input-error {
+            border-color: #e74c3c !important;
+            background: #fff0f0 !important;
+        }
+        
+        .area-count {
+            font-size: 0.8em;
+            color: #007bff;
+            font-weight: bold;
+            margin-left: 5px;
+        }
     </style>
 </head>
 <body>
@@ -247,23 +276,33 @@
         
         <div class="filter-group">
             <h3>🏠 Количество комнат</h3>
-            <div class="filter-options" id="rooms">
-                <button class="filter-option" data-value="studio">Студия</button>
-                <button class="filter-option" data-value="1">1</button>
-                <button class="filter-option" data-value="2">2</button>
-                <button class="filter-option" data-value="3">3</button>
-                <button class="filter-option" data-value="4">4</button>
-                <button class="filter-option" data-value="5">5</button>
-                <button class="filter-option" data-value="6">6</button>
-                <button class="filter-option" data-value="free">Свободная планировка</button>
+            <div id="rooms">
+                <div class="rooms-row-single">
+                    <button class="filter-option room-btn-full" data-value="studio">Студия</button>
+                </div>
+                <div class="rooms-row-pair">
+                    <button class="filter-option room-btn-half" data-value="1">1</button>
+                    <button class="filter-option room-btn-half" data-value="2">2</button>
+                </div>
+                <div class="rooms-row-pair">
+                    <button class="filter-option room-btn-half" data-value="3">3</button>
+                    <button class="filter-option room-btn-half" data-value="4">4</button>
+                </div>
+                <div class="rooms-row-pair">
+                    <button class="filter-option room-btn-half" data-value="5">5</button>
+                    <button class="filter-option room-btn-half" data-value="6">6</button>
+                </div>
+                <div class="rooms-row-single">
+                    <button class="filter-option room-btn-full" data-value="free">Свободная планировка</button>
+                </div>
             </div>
         </div>
 
         <div class="filter-group">
             <h3>💰 Ценовой диапазон</h3>
             <div class="price-inputs">
-                <input type="number" id="price-min" placeholder="От (руб.)">
-                <input type="number" id="price-max" placeholder="До (руб.)">
+                <input type="number" id="price-min" placeholder="От (руб.)" min="0">
+                <input type="number" id="price-max" placeholder="До (руб.)" min="0">
             </div>
         </div>
 
@@ -275,7 +314,7 @@
         <div class="filter-group">
             <h3>🚇 Время до метро</h3>
             <div class="metro-inputs" style="flex-direction: column; gap: 8px;">
-                <input type="number" id="metro-time" placeholder="Время (мин)">
+                <input type="number" id="metro-time" placeholder="Время (мин)" min="0">
                 <div class="filter-options" id="metro-transport">
                     <button class="filter-option" data-value="walk">🚶 Пешком</button>
                     <button class="filter-option" data-value="transport">🚌 Транспорт</button>
@@ -311,15 +350,15 @@
         <div class="filter-group">
             <h3>📐 Площадь</h3>
             <div class="area-inputs">
-                <input type="number" id="area-min" placeholder="От (м²)">
+                <input type="number" id="area-min" placeholder="От (м²)" min="0">
             </div>
         </div>
 
         <div class="filter-group">
             <h3>🏢 Этаж</h3>
             <div class="floor-inputs">
-                <input type="number" id="floor-min" placeholder="От">
-                <input type="number" id="floor-max" placeholder="До">
+                <input type="number" id="floor-min" placeholder="От" min="0">
+                <input type="number" id="floor-max" placeholder="До" min="0">
             </div>
             <button class="toggle-option" id="not-last-floor" data-value="not-last-floor">🏢 Не последний этаж</button>
         </div>
@@ -500,29 +539,70 @@
             });
         });
 
-        // Обработчики для полей ввода
-        document.getElementById('price-min').addEventListener('input', function() {
-            filters.priceMin = this.value;
-        });
-
-        document.getElementById('price-max').addEventListener('input', function() {
-            filters.priceMax = this.value;
-        });
-
-        document.getElementById('metro-time').addEventListener('input', function() {
-            filters.metroTime = this.value;
-        });
-
-        document.getElementById('area-min').addEventListener('input', function() {
-            filters.areaMin = this.value;
-        });
-
         document.getElementById('floor-min').addEventListener('input', function() {
-            filters.floorMin = this.value;
+            let val = parseInt(this.value, 10);
+            if (isNaN(val) || val <= 0) {
+                this.value = '';
+                filters.floorMin = null;
+            } else {
+                filters.floorMin = val;
+                // Только подсвечиваем max, если max < min, но не очищаем
+                let maxInput = document.getElementById('floor-max');
+                let maxVal = parseInt(maxInput.value, 10);
+                if (!isNaN(maxVal) && maxVal < val) {
+                    maxInput.classList.add('input-error');
+                } else {
+                    maxInput.classList.remove('input-error');
+                }
+            }
+        });
+        document.getElementById('floor-max').addEventListener('input', function() {
+            let val = parseInt(this.value, 10);
+            let minVal = parseInt(document.getElementById('floor-min').value, 10);
+            if (isNaN(val) || val <= 0) {
+                this.value = '';
+                filters.floorMax = null;
+                this.classList.remove('input-error');
+            } else if (!isNaN(minVal) && val < minVal) {
+                filters.floorMax = val;
+                this.classList.add('input-error');
+            } else {
+                filters.floorMax = val;
+                this.classList.remove('input-error');
+            }
         });
 
-        document.getElementById('floor-max').addEventListener('input', function() {
-            filters.floorMax = this.value;
+        document.getElementById('price-min').addEventListener('input', function() {
+            let val = parseInt(this.value, 10);
+            if (isNaN(val) || val <= 0) {
+                this.value = '';
+                filters.priceMin = null;
+            } else {
+                filters.priceMin = val;
+                // Только подсвечиваем max, если max < min, но не очищаем
+                let maxInput = document.getElementById('price-max');
+                let maxVal = parseInt(maxInput.value, 10);
+                if (!isNaN(maxVal) && maxVal < val) {
+                    maxInput.classList.add('input-error');
+                } else {
+                    maxInput.classList.remove('input-error');
+                }
+            }
+        });
+        document.getElementById('price-max').addEventListener('input', function() {
+            let val = parseInt(this.value, 10);
+            let minVal = parseInt(document.getElementById('price-min').value, 10);
+            if (isNaN(val) || val <= 0) {
+                this.value = '';
+                filters.priceMax = null;
+                this.classList.remove('input-error');
+            } else if (!isNaN(minVal) && val < minVal) {
+                filters.priceMax = val;
+                this.classList.add('input-error');
+            } else {
+                filters.priceMax = val;
+                this.classList.remove('input-error');
+            }
         });
 
         // Обработчики для кнопок-переключателей
@@ -546,10 +626,24 @@
             filters.notLastFloor = this.classList.contains('selected');
         });
 
-        // Сохранение фильтров
+        // Блокируем сохранение фильтров, если есть ошибка в цене или этаже
         function saveFilters() {
+            const priceMin = parseInt(document.getElementById('price-min').value, 10);
+            const priceMax = parseInt(document.getElementById('price-max').value, 10);
+            const floorMin = parseInt(document.getElementById('floor-min').value, 10);
+            const floorMax = parseInt(document.getElementById('floor-max').value, 10);
+            if (!isNaN(priceMin) && !isNaN(priceMax) && priceMax < priceMin) {
+                alert('Максимальная цена не может быть меньше минимальной!');
+                return;
+            }
+            if (!isNaN(floorMin) && !isNaN(floorMax) && floorMax < floorMin) {
+                alert('Этаж "до" не может быть меньше этажа "от"!');
+                return;
+            }
+            // Оптимизируем данные перед отправкой
+            const optimizedFilters = optimizeFilters();
             // Отправляем данные в Telegram
-            tg.sendData(JSON.stringify(filters));
+            tg.sendData(JSON.stringify(optimizedFilters));
             tg.close();
         }
 
@@ -589,6 +683,245 @@
             resetFilters();
             closeResetModal();
         }
+
+        // Функция для обновления пометки количества выбранных районов
+        function updateDistrictCount(districtName) {
+            const districtBtn = document.querySelector(`[data-district="${districtName}"]`);
+            const areasSection = districtBtn.nextElementSibling;
+            if (areasSection && areasSection.classList.contains('areas-section')) {
+                const selectedAreas = areasSection.querySelectorAll('.filter-option.selected').length;
+                const totalAreas = areasSection.querySelectorAll('.filter-option').length;
+                const countElement = districtBtn.querySelector('.area-count');
+                
+                if (selectedAreas > 0 && selectedAreas < totalAreas) {
+                    if (!countElement) {
+                        const count = document.createElement('span');
+                        count.className = 'area-count';
+                        count.textContent = ` (${selectedAreas})`;
+                        districtBtn.appendChild(count);
+                    } else {
+                        countElement.textContent = ` (${selectedAreas})`;
+                    }
+                } else if (countElement) {
+                    countElement.remove();
+                }
+            }
+        }
+
+        // Функция для проверки, выбраны ли все районы в округе
+        function areAllAreasSelected(districtName) {
+            const districtBtn = document.querySelector(`[data-district="${districtName}"]`);
+            const areasSection = districtBtn.nextElementSibling;
+            if (areasSection && areasSection.classList.contains('areas-section')) {
+                const selectedAreas = areasSection.querySelectorAll('.filter-option.selected').length;
+                const totalAreas = areasSection.querySelectorAll('.filter-option').length;
+                return selectedAreas === totalAreas;
+            }
+            return false;
+        }
+
+        // Функция для выбора всех районов в округе
+        function selectAllAreasInDistrict(districtName) {
+            const districtBtn = document.querySelector(`[data-district="${districtName}"]`);
+            const areasSection = districtBtn.nextElementSibling;
+            if (areasSection && areasSection.classList.contains('areas-section')) {
+                areasSection.querySelectorAll('.filter-option').forEach(areaBtn => {
+                    areaBtn.classList.add('selected');
+                    const areaName = areaBtn.textContent.trim();
+                    if (!filters.areas.includes(areaName)) {
+                        filters.areas.push(areaName);
+                    }
+                });
+            }
+        }
+
+        // Функция для снятия выбора всех районов в округе
+        function deselectAllAreasInDistrict(districtName) {
+            const districtBtn = document.querySelector(`[data-district="${districtName}"]`);
+            const areasSection = districtBtn.nextElementSibling;
+            if (areasSection && areasSection.classList.contains('areas-section')) {
+                areasSection.querySelectorAll('.filter-option').forEach(areaBtn => {
+                    areaBtn.classList.remove('selected');
+                    const areaName = areaBtn.textContent.trim();
+                    const index = filters.areas.indexOf(areaName);
+                    if (index > -1) {
+                        filters.areas.splice(index, 1);
+                    }
+                });
+            }
+        }
+
+        // Функция для оптимизации данных перед отправкой
+        function optimizeFilters() {
+            const optimizedFilters = { ...filters };
+            const optimizedDistricts = [];
+            const optimizedAreas = [];
+
+            // Проверяем каждый округ
+            districtsData.forEach(district => {
+                const districtName = district.name;
+                const districtAreas = district.areas || [];
+                
+                // Если округ выбран
+                if (filters.districts.includes(districtName)) {
+                    // Проверяем, выбраны ли все районы этого округа
+                    const allAreasSelected = districtAreas.every(area => 
+                        filters.areas.includes(area)
+                    );
+                    
+                    if (allAreasSelected) {
+                        // Если все районы выбраны, добавляем только округ
+                        optimizedDistricts.push(districtName);
+                        // Удаляем районы этого округа из списка
+                        districtAreas.forEach(area => {
+                            const index = optimizedAreas.indexOf(area);
+                            if (index > -1) {
+                                optimizedAreas.splice(index, 1);
+                            }
+                        });
+                    } else {
+                        // Если не все районы выбраны, НЕ добавляем округ, только выбранные районы
+                        districtAreas.forEach(area => {
+                            if (filters.areas.includes(area)) {
+                                optimizedAreas.push(area);
+                            }
+                        });
+                    }
+                } else {
+                    // Если округ не выбран, добавляем только выбранные районы
+                    districtAreas.forEach(area => {
+                        if (filters.areas.includes(area)) {
+                            optimizedAreas.push(area);
+                        }
+                    });
+                }
+            });
+
+            optimizedFilters.districts = optimizedDistricts;
+            optimizedFilters.areas = optimizedAreas;
+            return optimizedFilters;
+        }
+
+        // Обработчик клика по округу
+        function handleDistrictClick(districtName) {
+            const districtBtn = document.querySelector(`[data-district="${districtName}"]`);
+            const isSelected = districtBtn.classList.contains('selected');
+            
+            if (isSelected) {
+                // Снимаем выбор округа и всех его районов
+                districtBtn.classList.remove('selected');
+                const index = filters.districts.indexOf(districtName);
+                if (index > -1) {
+                    filters.districts.splice(index, 1);
+                }
+                deselectAllAreasInDistrict(districtName);
+            } else {
+                // Выбираем округ и все его районы
+                districtBtn.classList.add('selected');
+                if (!filters.districts.includes(districtName)) {
+                    filters.districts.push(districtName);
+                }
+                selectAllAreasInDistrict(districtName);
+            }
+            
+            updateDistrictCount(districtName);
+        }
+
+        // Обработчик клика по району
+        function handleAreaClick(areaName, districtName, event) {
+            const areaBtn = event.target;
+            const isSelected = areaBtn.classList.contains('selected');
+            
+            if (isSelected) {
+                // Снимаем выбор района
+                areaBtn.classList.remove('selected');
+                const index = filters.areas.indexOf(areaName);
+                if (index > -1) {
+                    filters.areas.splice(index, 1);
+                }
+                
+                // Снимаем выбор округа, если был выбран
+                const districtBtn = document.querySelector(`[data-district="${districtName}"]`);
+                if (districtBtn.classList.contains('selected')) {
+                    districtBtn.classList.remove('selected');
+                    const districtIndex = filters.districts.indexOf(districtName);
+                    if (districtIndex > -1) {
+                        filters.districts.splice(districtIndex, 1);
+                    }
+                }
+            } else {
+                // Выбираем район
+                areaBtn.classList.add('selected');
+                if (!filters.areas.includes(areaName)) {
+                    filters.areas.push(areaName);
+                }
+                
+                // Проверяем, нужно ли выбрать округ
+                if (areAllAreasSelected(districtName)) {
+                    const districtBtn = document.querySelector(`[data-district="${districtName}"]`);
+                    if (!districtBtn.classList.contains('selected')) {
+                        districtBtn.classList.add('selected');
+                        if (!filters.districts.includes(districtName)) {
+                            filters.districts.push(districtName);
+                        }
+                    }
+                }
+            }
+            
+            updateDistrictCount(districtName);
+        }
+
+        // Создание кнопок округов и районов
+        districtsData.forEach(district => {
+            const districtBtn = document.createElement('button');
+            districtBtn.className = 'filter-option';
+            districtBtn.textContent = district.name;
+            districtBtn.setAttribute('data-district', district.name);
+            districtBtn.onclick = () => handleDistrictClick(district.name);
+            
+            const districtContainer = document.createElement('div');
+            districtContainer.className = 'district-container';
+            districtContainer.appendChild(districtBtn);
+            
+            if (district.areas && district.areas.length > 0) {
+                const areasToggle = document.createElement('button');
+                areasToggle.className = 'areas-toggle';
+                areasToggle.innerHTML = 'Районы <span class="arrow">▼</span>';
+                areasToggle.onclick = function() {
+                    const areasSection = this.nextElementSibling;
+                    const arrow = this.querySelector('.arrow');
+                    if (areasSection.style.display === 'none' || areasSection.style.display === '') {
+                        areasSection.style.display = 'block';
+                        arrow.textContent = '▲';
+                    } else {
+                        areasSection.style.display = 'none';
+                        arrow.textContent = '▼';
+                    }
+                };
+                districtContainer.appendChild(areasToggle);
+                
+                const areasSection = document.createElement('div');
+                areasSection.className = 'areas-section';
+                areasSection.style.display = 'none';
+                
+                district.areas.forEach(area => {
+                    const areaBtn = document.createElement('button');
+                    areaBtn.className = 'filter-option';
+                    areaBtn.textContent = area;
+                    areaBtn.onclick = (event) => handleAreaClick(area, district.name, event);
+                    areasSection.appendChild(areaBtn);
+                });
+                
+                districtContainer.appendChild(areasSection);
+            } else {
+                // Добавляем невидимый элемент для выравнивания
+                const placeholder = document.createElement('div');
+                placeholder.className = 'areas-toggle-placeholder';
+                districtContainer.appendChild(placeholder);
+            }
+            
+            document.getElementById('districts').appendChild(districtContainer);
+        });
     </script>
 </body>
 </html> 
