@@ -451,16 +451,28 @@
                     okrugBtn.classList.add('okrug-btn--single');
                 }
                 okrugBtn.addEventListener('click', function() {
-                    this.classList.toggle('selected');
-                    if (this.classList.contains('selected')) {
-                        filters.districts.push(okrug);
+                    const allSelected = districtsData[okrug].every(area => filters.districts.includes(area));
+                    if (allSelected) {
+                        // Снять все районы
+                        districtsData[okrug].forEach(area => {
+                            filters.districts = filters.districts.filter(a => a !== area);
+                        });
+                        okrugBtn.classList.remove('selected');
+                        areaBtns.forEach(btn => btn.classList.remove('selected'));
                     } else {
-                        filters.districts = filters.districts.filter(d => d !== okrug);
+                        // Выбрать все районы
+                        districtsData[okrug].forEach(area => {
+                            if (!filters.districts.includes(area)) filters.districts.push(area);
+                        });
+                        okrugBtn.classList.add('selected');
+                        areaBtns.forEach(btn => btn.classList.add('selected'));
                     }
+                    updateOkrugBtn();
                 });
 
                 // Ярлычок-кнопка "Районы"
                 let areasSection = null;
+                let areaBtns = [];
                 if (districtsData[okrug].length > 0) {
                     const areasToggle = document.createElement('button');
                     areasToggle.className = 'areas-toggle';
@@ -492,7 +504,6 @@
                 // Секция районов (внутри блока округа, строго после строки с кнопками)
                 if (districtsData[okrug].length > 0) {
                     areasSection = document.createElement('div');
-                    areasSection.id = 'areas-section-' + okrug;
                     areasSection.className = 'areas-list-section';
                     const areaList = document.createElement('div');
                     areaList.className = 'filter-options';
@@ -501,20 +512,47 @@
                         areaBtn.className = 'filter-option area-btn';
                         areaBtn.dataset.value = area;
                         areaBtn.textContent = area;
-                        areaBtn.addEventListener('click', function() {
-                            this.classList.toggle('selected');
-                            if (this.classList.contains('selected')) {
-                                filters.districts.push(area);
+                        areaBtn.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            if (filters.districts.includes(area)) {
+                                filters.districts = filters.districts.filter(a => a !== area);
+                                areaBtn.classList.remove('selected');
                             } else {
-                                filters.districts = filters.districts.filter(d => d !== area);
+                                filters.districts.push(area);
+                                areaBtn.classList.add('selected');
+                            }
+                            // Если выбраны все районы — выделить округ
+                            const allSelected = districtsData[okrug].every(a => filters.districts.includes(a));
+                            if (allSelected) {
+                                okrugBtn.classList.add('selected');
+                            } else {
+                                okrugBtn.classList.remove('selected');
                             }
                         });
+                        areaBtns.push(areaBtn);
                         areaList.appendChild(areaBtn);
                     });
                     areasSection.appendChild(areaList);
                     okrugBlock.appendChild(areasSection);
                 }
                 districtsList.appendChild(okrugBlock);
+                // Функция для обновления состояния кнопки округа
+                function updateOkrugBtn() {
+                    const allSelected = districtsData[okrug].every(area => filters.districts.includes(area));
+                    if (allSelected) {
+                        okrugBtn.classList.add('selected');
+                    } else {
+                        okrugBtn.classList.remove('selected');
+                    }
+                    areaBtns.forEach(btn => {
+                        if (filters.districts.includes(btn.dataset.value)) {
+                            btn.classList.add('selected');
+                        } else {
+                            btn.classList.remove('selected');
+                        }
+                    });
+                }
+                updateOkrugBtn();
             });
         }
 
@@ -684,244 +722,46 @@
             closeResetModal();
         }
 
-        // Функция для обновления пометки количества выбранных районов
-        function updateDistrictCount(districtName) {
-            const districtBtn = document.querySelector(`[data-district="${districtName}"]`);
-            const areasSection = districtBtn.nextElementSibling;
-            if (areasSection && areasSection.classList.contains('areas-section')) {
-                const selectedAreas = areasSection.querySelectorAll('.filter-option.selected').length;
-                const totalAreas = areasSection.querySelectorAll('.filter-option').length;
-                const countElement = districtBtn.querySelector('.area-count');
-                
-                if (selectedAreas > 0 && selectedAreas < totalAreas) {
-                    if (!countElement) {
-                        const count = document.createElement('span');
-                        count.className = 'area-count';
-                        count.textContent = ` (${selectedAreas})`;
-                        districtBtn.appendChild(count);
-                    } else {
-                        countElement.textContent = ` (${selectedAreas})`;
-                    }
-                } else if (countElement) {
-                    countElement.remove();
-                }
-            }
-        }
-
-        // Функция для проверки, выбраны ли все районы в округе
-        function areAllAreasSelected(districtName) {
-            const districtBtn = document.querySelector(`[data-district="${districtName}"]`);
-            const areasSection = districtBtn.nextElementSibling;
-            if (areasSection && areasSection.classList.contains('areas-section')) {
-                const selectedAreas = areasSection.querySelectorAll('.filter-option.selected').length;
-                const totalAreas = areasSection.querySelectorAll('.filter-option').length;
-                return selectedAreas === totalAreas;
-            }
-            return false;
-        }
-
-        // Функция для выбора всех районов в округе
-        function selectAllAreasInDistrict(districtName) {
-            const districtBtn = document.querySelector(`[data-district="${districtName}"]`);
-            const areasSection = districtBtn.nextElementSibling;
-            if (areasSection && areasSection.classList.contains('areas-section')) {
-                areasSection.querySelectorAll('.filter-option').forEach(areaBtn => {
-                    areaBtn.classList.add('selected');
-                    const areaName = areaBtn.textContent.trim();
-                    if (!filters.areas.includes(areaName)) {
-                        filters.areas.push(areaName);
-                    }
-                });
-            }
-        }
-
-        // Функция для снятия выбора всех районов в округе
-        function deselectAllAreasInDistrict(districtName) {
-            const districtBtn = document.querySelector(`[data-district="${districtName}"]`);
-            const areasSection = districtBtn.nextElementSibling;
-            if (areasSection && areasSection.classList.contains('areas-section')) {
-                areasSection.querySelectorAll('.filter-option').forEach(areaBtn => {
-                    areaBtn.classList.remove('selected');
-                    const areaName = areaBtn.textContent.trim();
-                    const index = filters.areas.indexOf(areaName);
-                    if (index > -1) {
-                        filters.areas.splice(index, 1);
-                    }
-                });
-            }
-        }
-
-        // Функция для оптимизации данных перед отправкой
+        // Оптимизация фильтров для парсера: если выбраны все районы округа — округ, иначе только районы
         function optimizeFilters() {
-            const optimizedFilters = { ...filters };
-            const optimizedDistricts = [];
-            const optimizedAreas = [];
-
-            // Проверяем каждый округ
-            districtsData.forEach(district => {
-                const districtName = district.name;
-                const districtAreas = district.areas || [];
-                
-                // Если округ выбран
-                if (filters.districts.includes(districtName)) {
-                    // Проверяем, выбраны ли все районы этого округа
-                    const allAreasSelected = districtAreas.every(area => 
-                        filters.areas.includes(area)
-                    );
-                    
-                    if (allAreasSelected) {
-                        // Если все районы выбраны, добавляем только округ
-                        optimizedDistricts.push(districtName);
-                        // Удаляем районы этого округа из списка
-                        districtAreas.forEach(area => {
-                            const index = optimizedAreas.indexOf(area);
-                            if (index > -1) {
-                                optimizedAreas.splice(index, 1);
-                            }
-                        });
-                    } else {
-                        // Если не все районы выбраны, НЕ добавляем округ, только выбранные районы
-                        districtAreas.forEach(area => {
-                            if (filters.areas.includes(area)) {
-                                optimizedAreas.push(area);
-                            }
-                        });
-                    }
+            const result = { ...filters };
+            const districts = [];
+            const areas = [];
+            // districtsData должен быть доступен глобально
+            const allDistricts = window.districtsDataForOptimize || {};
+            Object.keys(allDistricts).forEach(okrug => {
+                const okrugAreas = allDistricts[okrug];
+                const allSelected = okrugAreas.length > 0 && okrugAreas.every(area => filters.districts.includes(area));
+                if (allSelected) {
+                    districts.push(okrug);
                 } else {
-                    // Если округ не выбран, добавляем только выбранные районы
-                    districtAreas.forEach(area => {
-                        if (filters.areas.includes(area)) {
-                            optimizedAreas.push(area);
-                        }
+                    okrugAreas.forEach(area => {
+                        if (filters.districts.includes(area)) areas.push(area);
                     });
                 }
             });
-
-            optimizedFilters.districts = optimizedDistricts;
-            optimizedFilters.areas = optimizedAreas;
-            return optimizedFilters;
+            result.districts = districts;
+            result.areas = areas;
+            return result;
         }
-
-        // Обработчик клика по округу
-        function handleDistrictClick(districtName) {
-            const districtBtn = document.querySelector(`[data-district="${districtName}"]`);
-            const isSelected = districtBtn.classList.contains('selected');
-            
-            if (isSelected) {
-                // Снимаем выбор округа и всех его районов
-                districtBtn.classList.remove('selected');
-                const index = filters.districts.indexOf(districtName);
-                if (index > -1) {
-                    filters.districts.splice(index, 1);
-                }
-                deselectAllAreasInDistrict(districtName);
-            } else {
-                // Выбираем округ и все его районы
-                districtBtn.classList.add('selected');
-                if (!filters.districts.includes(districtName)) {
-                    filters.districts.push(districtName);
-                }
-                selectAllAreasInDistrict(districtName);
-            }
-            
-            updateDistrictCount(districtName);
-        }
-
-        // Обработчик клика по району
-        function handleAreaClick(areaName, districtName, event) {
-            const areaBtn = event.target;
-            const isSelected = areaBtn.classList.contains('selected');
-            
-            if (isSelected) {
-                // Снимаем выбор района
-                areaBtn.classList.remove('selected');
-                const index = filters.areas.indexOf(areaName);
-                if (index > -1) {
-                    filters.areas.splice(index, 1);
-                }
-                
-                // Снимаем выбор округа, если был выбран
-                const districtBtn = document.querySelector(`[data-district="${districtName}"]`);
-                if (districtBtn.classList.contains('selected')) {
-                    districtBtn.classList.remove('selected');
-                    const districtIndex = filters.districts.indexOf(districtName);
-                    if (districtIndex > -1) {
-                        filters.districts.splice(districtIndex, 1);
-                    }
-                }
-            } else {
-                // Выбираем район
-                areaBtn.classList.add('selected');
-                if (!filters.areas.includes(areaName)) {
-                    filters.areas.push(areaName);
-                }
-                
-                // Проверяем, нужно ли выбрать округ
-                if (areAllAreasSelected(districtName)) {
-                    const districtBtn = document.querySelector(`[data-district="${districtName}"]`);
-                    if (!districtBtn.classList.contains('selected')) {
-                        districtBtn.classList.add('selected');
-                        if (!filters.districts.includes(districtName)) {
-                            filters.districts.push(districtName);
+        // Сохраняем districtsData глобально для optimizeFilters
+        window.districtsDataForOptimize = null;
+        fetch('districts_mapping.json')
+            .then(response => response.json())
+            .then(json => {
+                const districtsData = {};
+                const mos = json["Москва"];
+                if (mos && mos.districts) {
+                    Object.entries(mos.districts).forEach(([okrug, okrugData]) => {
+                        if (okrugData.areas && Object.values(okrugData.areas).length > 0) {
+                            districtsData[okrug] = Object.values(okrugData.areas);
+                        } else {
+                            districtsData[okrug] = [];
                         }
-                    }
+                    });
                 }
-            }
-            
-            updateDistrictCount(districtName);
-        }
-
-        // Создание кнопок округов и районов
-        districtsData.forEach(district => {
-            const districtBtn = document.createElement('button');
-            districtBtn.className = 'filter-option';
-            districtBtn.textContent = district.name;
-            districtBtn.setAttribute('data-district', district.name);
-            districtBtn.onclick = () => handleDistrictClick(district.name);
-            
-            const districtContainer = document.createElement('div');
-            districtContainer.className = 'district-container';
-            districtContainer.appendChild(districtBtn);
-            
-            if (district.areas && district.areas.length > 0) {
-                const areasToggle = document.createElement('button');
-                areasToggle.className = 'areas-toggle';
-                areasToggle.innerHTML = 'Районы <span class="arrow">▼</span>';
-                areasToggle.onclick = function() {
-                    const areasSection = this.nextElementSibling;
-                    const arrow = this.querySelector('.arrow');
-                    if (areasSection.style.display === 'none' || areasSection.style.display === '') {
-                        areasSection.style.display = 'block';
-                        arrow.textContent = '▲';
-                    } else {
-                        areasSection.style.display = 'none';
-                        arrow.textContent = '▼';
-                    }
-                };
-                districtContainer.appendChild(areasToggle);
-                
-                const areasSection = document.createElement('div');
-                areasSection.className = 'areas-section';
-                areasSection.style.display = 'none';
-                
-                district.areas.forEach(area => {
-                    const areaBtn = document.createElement('button');
-                    areaBtn.className = 'filter-option';
-                    areaBtn.textContent = area;
-                    areaBtn.onclick = (event) => handleAreaClick(area, district.name, event);
-                    areasSection.appendChild(areaBtn);
-                });
-                
-                districtContainer.appendChild(areasSection);
-            } else {
-                // Добавляем невидимый элемент для выравнивания
-                const placeholder = document.createElement('div');
-                placeholder.className = 'areas-toggle-placeholder';
-                districtContainer.appendChild(placeholder);
-            }
-            
-            document.getElementById('districts').appendChild(districtContainer);
-        });
+                window.districtsDataForOptimize = districtsData;
+            });
     </script>
 </body>
 </html> 
