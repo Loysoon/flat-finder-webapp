@@ -449,6 +449,12 @@
                 okrugBtn.textContent = okrug;
                 if (districtsData[okrug].length === 0) {
                     okrugBtn.classList.add('okrug-btn--single');
+                    // Синхронизируем выделение с filters.districts
+                    if (filters.districts.includes(okrug)) {
+                        okrugBtn.classList.add('selected');
+                    } else {
+                        okrugBtn.classList.remove('selected');
+                    }
                     okrugBtn.addEventListener('click', function() {
                         if (filters.districts.includes(okrug)) {
                             filters.districts = filters.districts.filter(a => a !== okrug);
