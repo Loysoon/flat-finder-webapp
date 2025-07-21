@@ -260,6 +260,13 @@
         .input-error {
             border-color: #e74c3c !important;
             background: #fff0f0 !important;
+            color: #222 !important;
+        }
+        @media (prefers-color-scheme: dark) {
+            .input-error {
+                background: #3a1a1a !important;
+                color: #fff !important;
+            }
         }
         
         .area-count {
@@ -617,69 +624,157 @@
             });
         });
 
-        document.getElementById('floor-min').addEventListener('input', function() {
+        // Время до метро
+        const metroTimeInput = document.getElementById('metro-time');
+        metroTimeInput.addEventListener('input', function() {
+            let val = parseInt(this.value, 10);
+            if (!isNaN(val)) {
+                filters.metroTime = val;
+            } else {
+                filters.metroTime = null;
+            }
+            // Не сбрасываем кнопки транспорта на input
+        });
+        metroTimeInput.addEventListener('blur', function() {
             let val = parseInt(this.value, 10);
             if (isNaN(val) || val <= 0) {
                 this.value = '';
-                filters.floorMin = null;
+                filters.metroTime = null;
+                // Сбросить кнопки транспорта
+                document.querySelectorAll('#metro-transport .filter-option').forEach(btn => {
+                    btn.classList.remove('selected');
+                    btn.disabled = true;
+                });
+                filters.metroTransport = null;
             } else {
-                filters.floorMin = val;
-                // Только подсвечиваем max, если max < min, но не очищаем
-                let maxInput = document.getElementById('floor-max');
-                let maxVal = parseInt(maxInput.value, 10);
-                if (!isNaN(maxVal) && maxVal < val) {
-                    maxInput.classList.add('input-error');
-                } else {
-                    maxInput.classList.remove('input-error');
-                }
+                // Активировать кнопки транспорта
+                document.querySelectorAll('#metro-transport .filter-option').forEach(btn => {
+                    btn.disabled = false;
+                });
             }
         });
-        document.getElementById('floor-max').addEventListener('input', function() {
+        // При инициализации делаем кнопки транспорта неактивными
+        document.querySelectorAll('#metro-transport .filter-option').forEach(btn => btn.disabled = true);
+
+        // Площадь
+        const areaMinInput = document.getElementById('area-min');
+        areaMinInput.addEventListener('input', function() {
             let val = parseInt(this.value, 10);
-            let minVal = parseInt(document.getElementById('floor-min').value, 10);
+            if (!isNaN(val)) {
+                filters.areaMin = val;
+            } else {
+                filters.areaMin = null;
+            }
+        });
+        areaMinInput.addEventListener('blur', function() {
+            let val = parseInt(this.value, 10);
             if (isNaN(val) || val <= 0) {
                 this.value = '';
-                filters.floorMax = null;
-                this.classList.remove('input-error');
-            } else if (!isNaN(minVal) && val < minVal) {
-                filters.floorMax = val;
-                this.classList.add('input-error');
-            } else {
-                filters.floorMax = val;
-                this.classList.remove('input-error');
+                filters.areaMin = null;
             }
         });
 
-        document.getElementById('price-min').addEventListener('input', function() {
+        // Цена
+        const priceMinInput = document.getElementById('price-min');
+        const priceMaxInput = document.getElementById('price-max');
+        priceMinInput.addEventListener('input', function() {
             let val = parseInt(this.value, 10);
+            if (!isNaN(val)) {
+                filters.priceMin = val;
+            } else {
+                filters.priceMin = null;
+            }
+        });
+        priceMinInput.addEventListener('blur', function() {
+            let val = parseInt(this.value, 10);
+            let maxVal = parseInt(priceMaxInput.value, 10);
             if (isNaN(val) || val <= 0) {
                 this.value = '';
                 filters.priceMin = null;
+                this.classList.remove('input-error');
+                priceMaxInput.classList.remove('input-error');
+            } else if (!isNaN(maxVal) && maxVal < val) {
+                this.classList.remove('input-error');
+                priceMaxInput.classList.add('input-error');
             } else {
-                filters.priceMin = val;
-                // Только подсвечиваем max, если max < min, но не очищаем
-                let maxInput = document.getElementById('price-max');
-                let maxVal = parseInt(maxInput.value, 10);
-                if (!isNaN(maxVal) && maxVal < val) {
-                    maxInput.classList.add('input-error');
-                } else {
-                    maxInput.classList.remove('input-error');
-                }
+                this.classList.remove('input-error');
+                priceMaxInput.classList.remove('input-error');
             }
         });
-        document.getElementById('price-max').addEventListener('input', function() {
+        priceMaxInput.addEventListener('input', function() {
             let val = parseInt(this.value, 10);
-            let minVal = parseInt(document.getElementById('price-min').value, 10);
+            if (!isNaN(val)) {
+                filters.priceMax = val;
+            } else {
+                filters.priceMax = null;
+            }
+        });
+        priceMaxInput.addEventListener('blur', function() {
+            let val = parseInt(this.value, 10);
+            let minVal = parseInt(priceMinInput.value, 10);
             if (isNaN(val) || val <= 0) {
                 this.value = '';
                 filters.priceMax = null;
                 this.classList.remove('input-error');
+                priceMinInput.classList.remove('input-error');
             } else if (!isNaN(minVal) && val < minVal) {
-                filters.priceMax = val;
                 this.classList.add('input-error');
+                priceMinInput.classList.remove('input-error');
             } else {
-                filters.priceMax = val;
                 this.classList.remove('input-error');
+                priceMinInput.classList.remove('input-error');
+            }
+        });
+
+        // Этаж
+        const floorMinInput = document.getElementById('floor-min');
+        const floorMaxInput = document.getElementById('floor-max');
+        floorMinInput.addEventListener('input', function() {
+            let val = parseInt(this.value, 10);
+            if (!isNaN(val)) {
+                filters.floorMin = val;
+            } else {
+                filters.floorMin = null;
+            }
+        });
+        floorMinInput.addEventListener('blur', function() {
+            let val = parseInt(this.value, 10);
+            let maxVal = parseInt(floorMaxInput.value, 10);
+            if (isNaN(val) || val <= 0) {
+                this.value = '';
+                filters.floorMin = null;
+                this.classList.remove('input-error');
+                floorMaxInput.classList.remove('input-error');
+            } else if (!isNaN(maxVal) && maxVal < val) {
+                this.classList.remove('input-error');
+                floorMaxInput.classList.add('input-error');
+            } else {
+                this.classList.remove('input-error');
+                floorMaxInput.classList.remove('input-error');
+            }
+        });
+        floorMaxInput.addEventListener('input', function() {
+            let val = parseInt(this.value, 10);
+            if (!isNaN(val)) {
+                filters.floorMax = val;
+            } else {
+                filters.floorMax = null;
+            }
+        });
+        floorMaxInput.addEventListener('blur', function() {
+            let val = parseInt(this.value, 10);
+            let minVal = parseInt(floorMinInput.value, 10);
+            if (isNaN(val) || val <= 0) {
+                this.value = '';
+                filters.floorMax = null;
+                this.classList.remove('input-error');
+                floorMinInput.classList.remove('input-error');
+            } else if (!isNaN(minVal) && val < minVal) {
+                this.classList.add('input-error');
+                floorMinInput.classList.remove('input-error');
+            } else {
+                this.classList.remove('input-error');
+                floorMinInput.classList.remove('input-error');
             }
         });
 
