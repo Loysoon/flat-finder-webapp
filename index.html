@@ -625,7 +625,7 @@
             updateAllAreasList();
         }
 
-        // --- Поиск по районам ---
+        // --- Поиск по районам с логами ---
         let allAreasList = [];
         function updateAllAreasList() {
             allAreasList = [];
@@ -677,6 +677,7 @@
         });
 
         function openOkrugAndHighlightArea(okrug, area) {
+            console.log('Вызвана openOkrugAndHighlightArea', okrug, area);
             const districtsList = document.getElementById('districts-list');
             const okrugBlocks = districtsList.querySelectorAll('.okrug-block');
             okrugBlocks.forEach(block => {
@@ -696,12 +697,13 @@
                             const btnVal = (btn.dataset.value || '').trim().toLowerCase();
                             if (btnVal === areaNorm) foundBtn = btn;
                         });
+                        console.log('Ищем район:', areaNorm, 'В секции есть:', areaBtns.map(b=>b.dataset.value));
                         if (foundBtn) {
                             foundBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
                             foundBtn.classList.add('area-highlight');
                             setTimeout(() => foundBtn.classList.remove('area-highlight'), 5000);
+                            console.log('Подсветили район:', foundBtn.dataset.value);
                         } else {
-                            console.log('Не найден район:', area, 'В секции есть:', areaBtns.map(b=>b.dataset.value));
                             alert('Не найден район: ' + area);
                         }
                     }, 100);
