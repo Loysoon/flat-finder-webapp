@@ -682,7 +682,6 @@
         });
 
         function openOkrugAndHighlightArea(okrug, area) {
-            console.log('Вызвана openOkrugAndHighlightArea', okrug, area);
             const districtsList = document.getElementById('districts-list');
             const okrugBlocks = districtsList.querySelectorAll('.okrug-block');
             okrugBlocks.forEach(block => {
@@ -694,24 +693,13 @@
                         areasSection.classList.add('open');
                         areasToggle.innerHTML = 'Районы <span style="font-size:18px;">&#8593;</span>';
                     }
-                    setTimeout(() => {
-                        const areaBtns = Array.from(areasSection.querySelectorAll('.area-btn'));
-                        const areaNorm = area.trim().toLowerCase();
-                        let foundBtn = null;
-                        areaBtns.forEach(btn => {
-                            const btnVal = (btn.dataset.value || '').trim().toLowerCase();
-                            if (btnVal === areaNorm) foundBtn = btn;
-                        });
-                        console.log('Ищем район:', areaNorm, 'В секции есть:', areaBtns.map(b=>b.dataset.value));
-                        if (foundBtn) {
-                            foundBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            foundBtn.classList.add('area-highlight');
-                            setTimeout(() => foundBtn.classList.remove('area-highlight'), 5000);
-                            console.log('Подсветили район:', foundBtn.dataset.value);
-                        } else {
-                            alert('Не найден район: ' + area);
-                        }
-                    }, 100);
+                    // Простой вариант подсветки
+                    const areaBtn = areasSection.querySelector('.area-btn[data-value="' + area + '"]');
+                    if (areaBtn) {
+                        areaBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        areaBtn.classList.add('area-highlight');
+                        setTimeout(() => areaBtn.classList.remove('area-highlight'), 5000);
+                    }
                 }
             });
         }
