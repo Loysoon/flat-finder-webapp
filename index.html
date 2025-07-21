@@ -534,7 +534,7 @@
                     areas.forEach(area => {
                         const areaBtn = document.createElement('button');
                         areaBtn.className = 'filter-option area-btn';
-                        areaBtn.dataset.value = area;
+                        areaBtn.dataset.value = area.trim();
                         areaBtn.textContent = area;
                         areaBtn.addEventListener('click', function(e) {
                             e.stopPropagation();
@@ -677,25 +677,25 @@
         });
 
         function openOkrugAndHighlightArea(okrug, area) {
-            // Найти toggle и секцию
             const districtsList = document.getElementById('districts-list');
             const okrugBlocks = districtsList.querySelectorAll('.okrug-block');
             okrugBlocks.forEach(block => {
                 const btn = block.querySelector('.okrug-btn');
                 if (btn && btn.dataset.value === okrug) {
-                    // Открыть секцию районов
                     const areasToggle = block.querySelector('.areas-toggle');
                     const areasSection = block.querySelector('.areas-list-section');
                     if (areasToggle && areasSection && !areasSection.classList.contains('open')) {
                         areasSection.classList.add('open');
                         areasToggle.innerHTML = 'Районы <span style="font-size:18px;">&#8593;</span>';
                     }
-                    // Найти кнопку района
-                    const areaBtn = areasSection.querySelector(`.area-btn[data-value="${area}"]`);
+                    // Найти кнопку района по точному совпадению
+                    const areaBtn = areasSection.querySelector('.area-btn[data-value="' + area.trim() + '"]');
                     if (areaBtn) {
                         areaBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
                         areaBtn.classList.add('area-highlight');
                         setTimeout(() => areaBtn.classList.remove('area-highlight'), 5000);
+                    } else {
+                        console.log('Не найден район:', area);
                     }
                 }
             });
