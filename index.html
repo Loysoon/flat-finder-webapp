@@ -275,6 +275,12 @@
             font-weight: bold;
             margin-left: 5px;
         }
+        .area-highlight {
+            background: #ffe066 !important;
+            color: #222 !important;
+            box-shadow: 0 0 0 2px #ffd700;
+            transition: background 0.3s;
+        }
     </style>
 </head>
 <body>
@@ -330,7 +336,14 @@
         </div>
 
         <div class="filter-group">
-            <h3>📍 Округа Москвы</h3>
+            <h3 style="display: flex; align-items: center; gap: 12px;">
+                📍 Округа Москвы
+                <div style="flex:1"></div>
+                <div style="position:relative; min-width:180px;">
+                    <input id="area-search" type="text" placeholder="Поиск района..." style="padding:6px 12px; border-radius:8px; border:1px solid #ccc; width:180px;">
+                    <div id="area-suggest" style="position:absolute; left:0; right:0; top:36px; background:#fff; z-index:10; border-radius:0 0 8px 8px; box-shadow:0 2px 8px rgba(0,0,0,0.08); display:none;"></div>
+                </div>
+            </h3>
             <div id="districts-list">
                 <!-- Округа и ярлычки районов будут добавлены динамически -->
             </div>
@@ -600,6 +613,77 @@
                 okrugRow.appendChild(emptyToggle);
                 okrugBlock.appendChild(okrugRow);
                 districtsList.appendChild(okrugBlock);
+            });
+        }
+
+        // --- Поиск по районам ---
+        let allAreasList = [];
+        function updateAllAreasList() {
+            allAreasList = [];
+            Object.keys(okrugsWithAreas).forEach(okrug => {
+                okrugsWithAreas[okrug].forEach(area => {
+                    allAreasList.push({ area, okrug });
+                });
+            });
+        }
+        updateAllAreasList();
+
+        const areaSearchInput = document.getElementById('area-search');
+        const areaSuggest = document.getElementById('area-suggest');
+        areaSearchInput.addEventListener('input', function() {
+            const val = this.value.trim().toLowerCase();
+            areaSuggest.innerHTML = '';
+            if (!val) {
+                areaSuggest.style.display = 'none';
+                return;
+            }
+            const found = allAreasList.filter(a => a.area.toLowerCase().includes(val));
+            if (found.length === 0) {
+                areaSuggest.style.display = 'none';
+                return;
+            }
+            found.slice(0, 7).forEach(({ area, okrug }) => {
+                const item = document.createElement('div');
+                item.textContent = `${area} (${okrug})`;
+                item.style.padding = '6px 12px';
+                item.style.cursor = 'pointer';
+                item.addEventListener('mousedown', function(e) {
+                    e.preventDefault();
+                    areaSearchInput.value = '';
+                    areaSuggest.style.display = 'none';
+                    // Развернуть округ и подсветить район
+                    openOkrugAndHighlightArea(okrug, area);
+                });
+                areaSuggest.appendChild(item);
+            });
+            areaSuggest.style.display = 'block';
+        });
+        document.body.addEventListener('click', function(e) {
+            if (!areaSearchInput.contains(e.target)) areaSuggest.style.display = 'none';
+        });
+
+        function openOkrugAndHighlightArea(okrug, area) {
+            // Найти toggle и секцию
+            const districtsList = document.getElementById('districts-list');
+            const okrugBlocks = districtsList.querySelectorAll('.okrug-block');
+            okrugBlocks.forEach(block => {
+                const btn = block.querySelector('.okrug-btn');
+                if (btn && btn.dataset.value === okrug) {
+                    // Открыть секцию районов
+                    const areasToggle = block.querySelector('.areas-toggle');
+                    const areasSection = block.querySelector('.areas-list-section');
+                    if (areasToggle && areasSection && !areasSection.classList.contains('open')) {
+                        areasSection.classList.add('open');
+                        areasToggle.innerHTML = 'Районы <span style="font-size:18px;">&#8593;</span>';
+                    }
+                    // Найти кнопку района
+                    const areaBtn = areasSection.querySelector(`.area-btn[data-value="${area}"]`);
+                    if (areaBtn) {
+                        areaBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        areaBtn.classList.add('area-highlight');
+                        setTimeout(() => areaBtn.classList.remove('area-highlight'), 5000);
+                    }
+                }
             });
         }
 
