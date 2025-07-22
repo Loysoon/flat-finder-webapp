@@ -941,7 +941,7 @@
             const optimizedFilters = optimizeFilters();
             // Отправляем данные в Telegram
             tg.sendData(JSON.stringify(optimizedFilters));
-            tg.close();
+            setTimeout(() => tg.close(), 300);
         }
 
         // Сброс фильтров
