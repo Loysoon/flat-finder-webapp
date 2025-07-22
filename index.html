@@ -422,19 +422,6 @@
         tg.ready();
         tg.expand();
 
-        // Получаем chat_id из initData (если есть)
-        let chatId = null;
-        try {
-            if (tg.initDataUnsafe && tg.initDataUnsafe.chat && tg.initDataUnsafe.chat.id) {
-                chatId = tg.initDataUnsafe.chat.id;
-            } else if (tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id) {
-                // Если чат — это личка, используем user.id
-                chatId = tg.initDataUnsafe.user.id;
-            }
-        } catch (e) {
-            chatId = null;
-        }
-
         // Данные фильтров
         let filters = {
             rooms: [],
@@ -1020,8 +1007,6 @@
             });
             result.districts = districts;
             result.areas = areas;
-            // Добавляем chat_id
-            result.chat_id = chatId;
             return result;
         }
     </script>
