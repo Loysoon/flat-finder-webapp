@@ -414,13 +414,26 @@
             </div>
         </div>
     </div>
-
+    
     <script src="https://telegram.org/js/telegram-web-app.js?58"></script>
     <script>
         // Инициализация Telegram Web App
         let tg = window.Telegram.WebApp;
         tg.ready();
         tg.expand();
+
+        // Получаем chat_id из initData (если есть)
+        let chatId = null;
+        try {
+            if (tg.initDataUnsafe && tg.initDataUnsafe.chat && tg.initDataUnsafe.chat.id) {
+                chatId = tg.initDataUnsafe.chat.id;
+            } else if (tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id) {
+                // Если чат — это личка, используем user.id
+                chatId = tg.initDataUnsafe.user.id;
+            }
+        } catch (e) {
+            chatId = null;
+        }
 
         // Данные фильтров
         let filters = {
@@ -710,7 +723,7 @@
                             function blink() {
                                 areaBtn.classList.toggle('area-highlight');
                                 blinkCount++;
-                                if (blinkCount < 10) {
+                                if (blinkCount < 10) { // 5 раз: 5 включений и 5 выключений
                                     setTimeout(blink, 250);
                                 } else {
                                     areaBtn.classList.remove('area-highlight');
@@ -942,7 +955,7 @@
             const optimizedFilters = optimizeFilters();
             // Отправляем данные в Telegram
             tg.sendData(JSON.stringify(optimizedFilters));
-            setTimeout(() => tg.close(), 300);
+            tg.close();
         }
 
         // Сброс фильтров
@@ -1007,6 +1020,8 @@
             });
             result.districts = districts;
             result.areas = areas;
+            // Добавляем chat_id
+            result.chat_id = chatId;
             return result;
         }
     </script>
