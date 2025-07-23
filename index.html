@@ -373,7 +373,7 @@
             <div class="filter-options" id="amenities">
                 <button class="filter-option" data-value="conditioner">🌡️ Кондиционер</button>
                 <button class="filter-option" data-value="rfgr">🧊 Холодильник</button>
-                <button class="filter-option" data-value="dishw_asher">🍽️ Посудомойка</button>
+                <button class="filter-option" data-value="dishw_washer">🍽️ Посудомойка</button>
                 <button class="filter-option" data-value="wm">👕 Стиралка</button>
                 <button class="filter-option" data-value="internet">🌐 Интернет</button>
                 <button class="filter-option" data-value="tv">📺 Телевизор</button>
@@ -410,7 +410,7 @@
                 <input type="number" id="floor-min" placeholder="От" min="0">
                 <input type="number" id="floor-max" placeholder="До" min="0">
             </div>
-            <button class="toggle-option" id="not-last-floor" data-value="not-last-floor">🏢 Не последний этаж</button>
+            <button class="toggle-option" id="not-last-floor" data-value="floornl">🏢 Не последний этаж</button>
         </div>
 
         <button class="save-btn" onclick="saveFilters()">✅ Сохранить настройки</button>
@@ -1022,39 +1022,28 @@
             // 4. Способ добраться до метро
             result.metroTransport = filters.metroTransport ? Number(filters.metroTransport) : null;
             // 5. Районы и округа — ids из districts_mapping, объединённые
-            // Для этого нужно получить mapping из districts_mapping.json
-            // Предполагаем, что okrugsWithAreas и okrugsWithoutAreas уже загружены
-            // и allAreasList [{area, okrug, id}]
-            let selectedDistrictIds = [];
-            // Собираем id для выбранных округов без районов
-            if (window.districtsMappingRaw) {
-                const mapping = window.districtsMappingRaw;
-                const mos = mapping["Москва"];
-                if (mos && mos.districts) {
-                    // Округа без районов
-                    Object.entries(mos.districts).forEach(([okrug, okrugData]) => {
-                        if (!okrugData.areas || Object.values(okrugData.areas).length === 0) {
-                            if (filters.districts.includes(okrug)) {
-                                if (okrugData.id) selectedDistrictIds.push(Number(okrugData.id));
-                            }
-                        } else {
-                            // Округа с районами
-                            Object.entries(okrugData.areas).forEach(([areaName, areaId]) => {
-                                if (filters.districts.includes(areaName)) {
-                                    selectedDistrictIds.push(Number(areaId));
-                                }
-                            });
-                            // Если выбран весь округ (все районы), добавлять id округа
-                            const allAreas = Object.values(okrugData.areas);
-                            const allSelected = allAreas.length > 0 && allAreas.every(area => filters.districts.includes(areaNameById(area, okrugData.areas)));
-                            if (allSelected && okrugData.id) {
-                                selectedDistrictIds.push(Number(okrugData.id));
-                            }
-                        }
+            // --- ВОССТАНОВИТЬ старую логику округов и районов ---
+            const districts = [];
+            const areas = [];
+            okrugsWithoutAreas.forEach(okrug => {
+                if (filters.districts.includes(okrug)) {
+                    districts.push(okrug);
+                }
+            });
+            Object.keys(okrugsWithAreas).forEach(okrug => {
+                const okrugAreas = okrugsWithAreas[okrug];
+                const allSelected = okrugAreas.length > 0 && okrugAreas.every(area => filters.districts.includes(area));
+                if (allSelected) {
+                    districts.push(okrug);
+                } else {
+                    okrugAreas.forEach(area => {
+                        if (filters.districts.includes(area)) areas.push(area);
                     });
                 }
-            }
-            result.districts = selectedDistrictIds;
+            });
+            result.districts = districts;
+            result.areas = areas;
+            // --- оставить новую обработку остальных фильтров ---
             // 6. Площадь
             result.areaMin = filters.areaMin ? Number(filters.areaMin) : null;
             // 7. Этажи
@@ -1075,7 +1064,7 @@
             if (filters.withPets) options.push("pets");
             // Не последний этаж
             if (filters.notLastFloor) options.push("floornl");
-            result.options = options;
+            result.options = filters.options.slice();
             return result;
         }
 
