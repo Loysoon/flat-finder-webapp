@@ -1093,6 +1093,11 @@
             // Не последний этаж
             if (filters.notLastFloor) options.push("floornl");
             result.options = options;
+            // В самом конце объединяем districts и areas в один массив districts
+            if (Array.isArray(result.districts) && Array.isArray(result.areas)) {
+                result.districts = result.districts.concat(result.areas);
+                delete result.areas;
+            }
             return result;
         }
 
