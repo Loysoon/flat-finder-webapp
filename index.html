@@ -984,6 +984,7 @@
 
         // Сброс фильтров
         function resetFilters() {
+            // Сбросить все значения фильтров
             filters = {
                 rooms: [],
                 priceMin: null,
@@ -997,7 +998,9 @@
                 floorMax: null,
                 renovation: []
             };
+            // Снять выделение со всех кнопок
             document.querySelectorAll('.filter-option, .toggle-option').forEach(btn => btn.classList.remove('selected'));
+            // Очистить все input
             document.querySelectorAll('input[type="number"]').forEach(inp => inp.value = '');
         }
 
