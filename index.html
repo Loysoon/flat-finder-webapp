@@ -1064,12 +1064,12 @@
                         return foundId !== null ? foundId : areaName;
                     });
                 } else {
-                    result.districts = districts;
-                    result.areas = areas;
+                    result.districts = [];
+                    result.areas = [];
                 }
             } else {
-                result.districts = districts;
-                result.areas = areas;
+                result.districts = [];
+                result.areas = [];
             }
             // --- оставить новую обработку остальных фильтров ---
             // 6. Площадь
