@@ -343,7 +343,7 @@
 
         <div class="filter-group">
             <h3>👤 Собственник</h3>
-            <button class="toggle-option" data-value="owner">👤 Только собственник</button>
+            <button class="toggle-option" id="owner-only" data-value="owner">👤 Только собственник</button>
         </div>
 
         <div class="filter-group">
@@ -382,8 +382,8 @@
 
         <div class="filter-group">
             <h3>👨‍👩‍👧‍👦 Условия проживания</h3>
-            <button class="toggle-option" data-value="kids">👶 Можно с детьми</button>
-            <button class="toggle-option" data-value="pets">🐕 Можно с животными</button>
+            <button class="toggle-option" id="with-children" data-value="kids">👶 Можно с детьми</button>
+            <button class="toggle-option" id="with-pets" data-value="pets">🐕 Можно с животными</button>
         </div>
 
         <!-- Новый блок: Тип ремонта -->
@@ -410,7 +410,7 @@
                 <input type="number" id="floor-min" placeholder="От" min="0">
                 <input type="number" id="floor-max" placeholder="До" min="0">
             </div>
-            <button class="toggle-option" data-value="not-last-floor">🏢 Не последний этаж</button>
+            <button class="toggle-option" id="not-last-floor" data-value="not-last-floor">🏢 Не последний этаж</button>
         </div>
 
         <button class="save-btn" onclick="saveFilters()">✅ Сохранить настройки</button>
@@ -438,13 +438,17 @@
             rooms: [],
             priceMin: null,
             priceMax: null,
+            ownerOnly: false,
             metroTime: null,
             metroTransport: null,
             districts: [],
-            options: [], // универсальный массив для всех опций
+            amenities: [],
+            withChildren: false,
+            withPets: false,
             areaMin: null,
             floorMin: null,
             floorMax: null,
+            notLastFloor: false,
             renovation: []
         };
 
@@ -456,20 +460,6 @@
                     filters.rooms.push(this.dataset.value);
                 } else {
                     filters.rooms = filters.rooms.filter(r => r !== this.dataset.value);
-                }
-            });
-        });
-
-        // Универсальный обработчик для всех опций (удобства, собственник, дети, животные, не последний этаж)
-        document.querySelectorAll('.filter-option[data-value], .toggle-option[data-value]').forEach(btn => {
-            btn.addEventListener('click', function() {
-                this.classList.toggle('selected');
-                if (this.classList.contains('selected')) {
-                    if (!filters.options.includes(this.dataset.value)) {
-                        filters.options.push(this.dataset.value);
-                    }
-                } else {
-                    filters.options = filters.options.filter(a => a !== this.dataset.value);
                 }
             });
         });
@@ -760,16 +750,14 @@
             });
         });
 
-        // Обработчики для удобств (и других опций) (множественный выбор)
-        document.querySelectorAll('#amenities .filter-option, .toggle-option').forEach(btn => {
+        // Обработчики для удобств (множественный выбор)
+        document.querySelectorAll('#amenities .filter-option').forEach(btn => {
             btn.addEventListener('click', function() {
                 this.classList.toggle('selected');
                 if (this.classList.contains('selected')) {
-                    if (!filters.options.includes(this.dataset.value)) {
-                        filters.options.push(this.dataset.value);
-                    }
+                    filters.amenities.push(this.dataset.value);
                 } else {
-                    filters.options = filters.options.filter(a => a !== this.dataset.value);
+                    filters.amenities = filters.amenities.filter(a => a !== this.dataset.value);
                 }
             });
         });
@@ -941,22 +929,22 @@
         });
 
         // Обработчики для кнопок-переключателей
-        document.querySelectorAll('.toggle-option[data-value="owner"]').addEventListener('click', function() {
+        document.getElementById('owner-only').addEventListener('click', function() {
             this.classList.toggle('selected');
             filters.ownerOnly = this.classList.contains('selected');
         });
 
-        document.querySelectorAll('.toggle-option[data-value="kids"]').addEventListener('click', function() {
+        document.getElementById('with-children').addEventListener('click', function() {
             this.classList.toggle('selected');
             filters.withChildren = this.classList.contains('selected');
         });
 
-        document.querySelectorAll('.toggle-option[data-value="pets"]').addEventListener('click', function() {
+        document.getElementById('with-pets').addEventListener('click', function() {
             this.classList.toggle('selected');
             filters.withPets = this.classList.contains('selected');
         });
 
-        document.querySelectorAll('.toggle-option[data-value="not-last-floor"]').addEventListener('click', function() {
+        document.getElementById('not-last-floor').addEventListener('click', function() {
             this.classList.toggle('selected');
             filters.notLastFloor = this.classList.contains('selected');
         });
@@ -989,13 +977,17 @@
                 rooms: [],
                 priceMin: null,
                 priceMax: null,
+                ownerOnly: false,
                 metroTime: null,
                 metroTransport: null,
                 districts: [],
-                options: [],
+                amenities: [],
+                withChildren: false,
+                withPets: false,
                 areaMin: null,
                 floorMin: null,
                 floorMax: null,
+                notLastFloor: false,
                 renovation: []
             };
             // Снять выделение со всех кнопок
@@ -1070,8 +1062,20 @@
             result.floorMax = filters.floorMax ? Number(filters.floorMax) : null;
             // 8. Тип ремонта (массив чисел)
             result.renovation = filters.renovation.map(Number).filter(n => !isNaN(n));
-            // options — все булевы и строковые опции
-            result.options = filters.options.slice();
+            // 9. options — все булевые и строковые опции
+            let options = [];
+            // Собственник
+            if (filters.ownerOnly) options.push("is_by_homeowner");
+            // Удобства
+            if (filters.amenities && Array.isArray(filters.amenities)) {
+                options = options.concat(filters.amenities);
+            }
+            // Условия проживания
+            if (filters.withChildren) options.push("kids");
+            if (filters.withPets) options.push("pets");
+            // Не последний этаж
+            if (filters.notLastFloor) options.push("floornl");
+            result.options = options;
             return result;
         }
 
