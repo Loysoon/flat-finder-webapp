@@ -1023,26 +1023,35 @@
             result.metroTransport = filters.metroTransport ? Number(filters.metroTransport) : null;
             // 5. Районы и округа — ids из districts_mapping, объединённые
             // --- ВОССТАНОВИТЬ старую логику округов и районов ---
-            const districts = [];
-            const areas = [];
-            okrugsWithoutAreas.forEach(okrug => {
-                if (filters.districts.includes(okrug)) {
-                    districts.push(okrug);
-                }
-            });
-            Object.keys(okrugsWithAreas).forEach(okrug => {
-                const okrugAreas = okrugsWithAreas[okrug];
-                const allSelected = okrugAreas.length > 0 && okrugAreas.every(area => filters.districts.includes(area));
-                if (allSelected) {
-                    districts.push(okrug);
-                } else {
-                    okrugAreas.forEach(area => {
-                        if (filters.districts.includes(area)) areas.push(area);
+            let districtIds = [];
+            let areaIds = [];
+            if (window.districtsMappingRaw) {
+                const mapping = window.districtsMappingRaw;
+                const mos = mapping["Москва"];
+                if (mos && mos.districts) {
+                    // Округа
+                    filters.districts.forEach(okrugName => {
+                        const okrugData = mos.districts[okrugName];
+                        if (okrugData && okrugData.id) {
+                            districtIds.push(Number(okrugData.id));
+                        }
+                    });
+                    // Районы
+                    filters.districts.forEach(areaName => {
+                        Object.values(mos.districts).forEach(okrugData => {
+                            if (okrugData.areas) {
+                                Object.entries(okrugData.areas).forEach(([areaId, name]) => {
+                                    if (name === areaName) {
+                                        areaIds.push(Number(areaId));
+                                    }
+                                });
+                            }
+                        });
                     });
                 }
-            });
-            result.districts = districts;
-            result.areas = areas;
+            }
+            result.districts = districtIds;
+            result.areas = areaIds;
             // --- оставить новую обработку остальных фильтров ---
             // 6. Площадь
             result.areaMin = filters.areaMin ? Number(filters.areaMin) : null;
