@@ -1064,7 +1064,7 @@
             if (filters.withPets) options.push("pets");
             // Не последний этаж
             if (filters.notLastFloor) options.push("floornl");
-            result.options = filters.options.slice();
+            result.options = options;
             return result;
         }
 
