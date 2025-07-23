@@ -1022,35 +1022,27 @@
             // 4. Способ добраться до метро
             result.metroTransport = filters.metroTransport ? Number(filters.metroTransport) : null;
             // 5. Районы и округа — ids из districts_mapping, объединённые
-            let selectedIds = [];
-            if (window.districtsMappingRaw) {
-                const mapping = window.districtsMappingRaw;
-                const mos = mapping["Москва"];
-                if (mos && mos.districts) {
-                    Object.entries(mos.districts).forEach(([okrug, okrugData]) => {
-                        // Округа без районов
-                        if (!okrugData.areas || Object.keys(okrugData.areas).length === 0) {
-                            if (filters.districts.includes(okrug) && okrugData.id) {
-                                selectedIds.push(Number(okrugData.id));
-                            }
-                        } else {
-                            // Округа с районами
-                            Object.entries(okrugData.areas).forEach(([areaId, areaName]) => {
-                                if (filters.districts.includes(areaName)) {
-                                    selectedIds.push(Number(areaId));
-                                }
-                            });
-                            // Если выбран весь округ (все районы), добавить id округа
-                            const allAreaNames = Object.values(okrugData.areas);
-                            const allSelected = allAreaNames.length > 0 && allAreaNames.every(areaName => filters.districts.includes(areaName));
-                            if (allSelected && okrugData.id) {
-                                selectedIds.push(Number(okrugData.id));
-                            }
-                        }
+            // --- ВОССТАНОВИТЬ старую логику округов и районов ---
+            const districts = [];
+            const areas = [];
+            okrugsWithoutAreas.forEach(okrug => {
+                if (filters.districts.includes(okrug)) {
+                    districts.push(okrug);
+                }
+            });
+            Object.keys(okrugsWithAreas).forEach(okrug => {
+                const okrugAreas = okrugsWithAreas[okrug];
+                const allSelected = okrugAreas.length > 0 && okrugAreas.every(area => filters.districts.includes(area));
+                if (allSelected) {
+                    districts.push(okrug);
+                } else {
+                    okrugAreas.forEach(area => {
+                        if (filters.districts.includes(area)) areas.push(area);
                     });
                 }
-            }
-            result.districts = selectedIds;
+            });
+            result.districts = districts;
+            result.areas = areas;
             // --- оставить новую обработку остальных фильтров ---
             // 6. Площадь
             result.areaMin = filters.areaMin ? Number(filters.areaMin) : null;
@@ -1072,7 +1064,7 @@
             if (filters.withPets) options.push("pets");
             // Не последний этаж
             if (filters.notLastFloor) options.push("floornl");
-            result.options = filters.options.slice();
+            result.options = options;
             return result;
         }
 
