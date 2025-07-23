@@ -1022,28 +1022,27 @@
             // 4. Способ добраться до метро
             result.metroTransport = filters.metroTransport ? Number(filters.metroTransport) : null;
             // 5. Районы и округа — ids из districts_mapping, объединённые
-            // --- districts: ids округов и районов, объединённые в один массив ---
             let selectedIds = [];
             if (window.districtsMappingRaw) {
                 const mapping = window.districtsMappingRaw;
                 const mos = mapping["Москва"];
                 if (mos && mos.districts) {
-                    // Округа без районов
                     Object.entries(mos.districts).forEach(([okrug, okrugData]) => {
-                        if (!okrugData.areas || Object.values(okrugData.areas).length === 0) {
+                        // Округа без районов
+                        if (!okrugData.areas || Object.keys(okrugData.areas).length === 0) {
                             if (filters.districts.includes(okrug) && okrugData.id) {
                                 selectedIds.push(Number(okrugData.id));
                             }
                         } else {
                             // Округа с районами
-                            Object.entries(okrugData.areas).forEach(([areaName, areaId]) => {
+                            Object.entries(okrugData.areas).forEach(([areaId, areaName]) => {
                                 if (filters.districts.includes(areaName)) {
                                     selectedIds.push(Number(areaId));
                                 }
                             });
                             // Если выбран весь округ (все районы), добавить id округа
-                            const allAreas = Object.keys(okrugData.areas);
-                            const allSelected = allAreas.length > 0 && allAreas.every(areaName => filters.districts.includes(areaName));
+                            const allAreaNames = Object.values(okrugData.areas);
+                            const allSelected = allAreaNames.length > 0 && allAreaNames.every(areaName => filters.districts.includes(areaName));
                             if (allSelected && okrugData.id) {
                                 selectedIds.push(Number(okrugData.id));
                             }
@@ -1073,7 +1072,7 @@
             if (filters.withPets) options.push("pets");
             // Не последний этаж
             if (filters.notLastFloor) options.push("floornl");
-            result.options = options;
+            result.options = filters.options.slice();
             return result;
         }
 
@@ -1097,14 +1096,6 @@
                 }
                 buildDistrictsUI();
             });
-
-        // --- ДОБАВИТЬ: функцию поиска имени района по id ---
-        function areaNameById(id, areasObj) {
-            for (const [name, areaId] of Object.entries(areasObj)) {
-                if (String(areaId) === String(id)) return name;
-            }
-            return null;
-        }
     </script>
 </body>
 </html> 
