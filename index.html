@@ -313,7 +313,7 @@
             <h3>🏠 Количество комнат</h3>
             <div id="rooms">
                 <div class="rooms-row-single">
-                    <button class="filter-option room-btn-full" data-value="studio">Студия</button>
+                    <button class="filter-option room-btn-full" data-value="9">Студия</button>
                 </div>
                 <div class="rooms-row-pair">
                     <button class="filter-option room-btn-half" data-value="1">1</button>
@@ -328,7 +328,7 @@
                     <button class="filter-option room-btn-half" data-value="6">6</button>
                 </div>
                 <div class="rooms-row-single">
-                    <button class="filter-option room-btn-full" data-value="free">Свободная планировка</button>
+                    <button class="filter-option room-btn-full" data-value="7">Свободная планировка</button>
                 </div>
             </div>
         </div>
@@ -343,7 +343,7 @@
 
         <div class="filter-group">
             <h3>👤 Собственник</h3>
-            <button class="toggle-option" id="owner-only" data-value="owner">👤 Только собственник</button>
+            <button class="toggle-option" data-value="owner">👤 Только собственник</button>
         </div>
 
         <div class="filter-group">
@@ -351,8 +351,8 @@
             <div class="metro-inputs" style="flex-direction: column; gap: 8px;">
                 <input type="number" id="metro-time" placeholder="Время (мин)" min="0">
                 <div class="filter-options" id="metro-transport">
-                    <button class="filter-option" data-value="walk">🚶 Пешком</button>
-                    <button class="filter-option" data-value="transport">🚌 Транспорт</button>
+                    <button class="filter-option" data-value="2">🚶 Пешком</button>
+                    <button class="filter-option" data-value="-2">🚌 Транспорт</button>
                 </div>
             </div>
         </div>
@@ -373,7 +373,7 @@
             <div class="filter-options" id="amenities">
                 <button class="filter-option" data-value="conditioner">🌡️ Кондиционер</button>
                 <button class="filter-option" data-value="rfgr">🧊 Холодильник</button>
-                <button class="filter-option" data-value="dishwasher">🍽️ Посудомойка</button>
+                <button class="filter-option" data-value="dishw_asher">🍽️ Посудомойка</button>
                 <button class="filter-option" data-value="wm">👕 Стиралка</button>
                 <button class="filter-option" data-value="internet">🌐 Интернет</button>
                 <button class="filter-option" data-value="tv">📺 Телевизор</button>
@@ -382,8 +382,19 @@
 
         <div class="filter-group">
             <h3>👨‍👩‍👧‍👦 Условия проживания</h3>
-            <button class="toggle-option" id="with-children" data-value="children">👶 Можно с детьми</button>
-            <button class="toggle-option" id="with-pets" data-value="pets">🐕 Можно с животными</button>
+            <button class="toggle-option" data-value="kids">👶 Можно с детьми</button>
+            <button class="toggle-option" data-value="pets">🐕 Можно с животными</button>
+        </div>
+
+        <!-- Новый блок: Тип ремонта -->
+        <div class="filter-group">
+            <h3>🛠️ Тип ремонта</h3>
+            <div class="filter-options" id="renovation-types">
+                <button class="filter-option" data-value="1">Без ремонта</button>
+                <button class="filter-option" data-value="2">Косметический</button>
+                <button class="filter-option" data-value="3">Евроремонт</button>
+                <button class="filter-option" data-value="4">Дизайнерский</button>
+            </div>
         </div>
 
         <div class="filter-group">
@@ -399,7 +410,7 @@
                 <input type="number" id="floor-min" placeholder="От" min="0">
                 <input type="number" id="floor-max" placeholder="До" min="0">
             </div>
-            <button class="toggle-option" id="not-last-floor" data-value="not-last-floor">🏢 Не последний этаж</button>
+            <button class="toggle-option" data-value="not-last-floor">🏢 Не последний этаж</button>
         </div>
 
         <button class="save-btn" onclick="saveFilters()">✅ Сохранить настройки</button>
@@ -427,17 +438,14 @@
             rooms: [],
             priceMin: null,
             priceMax: null,
-            ownerOnly: false,
             metroTime: null,
             metroTransport: null,
             districts: [],
-            amenities: [],
-            withChildren: false,
-            withPets: false,
+            options: [], // универсальный массив для всех опций
             areaMin: null,
             floorMin: null,
             floorMax: null,
-            notLastFloor: false
+            renovation: []
         };
 
         // Обработчики для кнопок комнат (множественный выбор)
@@ -452,12 +460,27 @@
             });
         });
 
+        // Универсальный обработчик для всех опций (удобства, собственник, дети, животные, не последний этаж)
+        document.querySelectorAll('.filter-option[data-value], .toggle-option[data-value]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.classList.toggle('selected');
+                if (this.classList.contains('selected')) {
+                    if (!filters.options.includes(this.dataset.value)) {
+                        filters.options.push(this.dataset.value);
+                    }
+                } else {
+                    filters.options = filters.options.filter(a => a !== this.dataset.value);
+                }
+            });
+        });
+
         // Загрузка округов и районов из districts_mapping.json
         let okrugsWithAreas = {};
         let okrugsWithoutAreas = [];
         fetch('districts_mapping.json')
             .then(response => response.json())
             .then(json => {
+                window.districtsMappingRaw = json;
                 okrugsWithAreas = {};
                 okrugsWithoutAreas = [];
                 const mos = json["Москва"];
@@ -737,14 +760,28 @@
             });
         });
 
-        // Обработчики для удобств (множественный выбор)
-        document.querySelectorAll('#amenities .filter-option').forEach(btn => {
+        // Обработчики для удобств (и других опций) (множественный выбор)
+        document.querySelectorAll('#amenities .filter-option, .toggle-option').forEach(btn => {
             btn.addEventListener('click', function() {
                 this.classList.toggle('selected');
                 if (this.classList.contains('selected')) {
-                    filters.amenities.push(this.dataset.value);
+                    if (!filters.options.includes(this.dataset.value)) {
+                        filters.options.push(this.dataset.value);
+                    }
                 } else {
-                    filters.amenities = filters.amenities.filter(a => a !== this.dataset.value);
+                    filters.options = filters.options.filter(a => a !== this.dataset.value);
+                }
+            });
+        });
+
+        // Обработчики для типа ремонта (множественный выбор)
+        document.querySelectorAll('#renovation-types .filter-option').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.classList.toggle('selected');
+                if (this.classList.contains('selected')) {
+                    filters.renovation.push(this.dataset.value);
+                } else {
+                    filters.renovation = filters.renovation.filter(r => r !== this.dataset.value);
                 }
             });
         });
@@ -904,22 +941,22 @@
         });
 
         // Обработчики для кнопок-переключателей
-        document.getElementById('owner-only').addEventListener('click', function() {
+        document.querySelectorAll('.toggle-option[data-value="owner"]').addEventListener('click', function() {
             this.classList.toggle('selected');
             filters.ownerOnly = this.classList.contains('selected');
         });
 
-        document.getElementById('with-children').addEventListener('click', function() {
+        document.querySelectorAll('.toggle-option[data-value="kids"]').addEventListener('click', function() {
             this.classList.toggle('selected');
             filters.withChildren = this.classList.contains('selected');
         });
 
-        document.getElementById('with-pets').addEventListener('click', function() {
+        document.querySelectorAll('.toggle-option[data-value="pets"]').addEventListener('click', function() {
             this.classList.toggle('selected');
             filters.withPets = this.classList.contains('selected');
         });
 
-        document.getElementById('not-last-floor').addEventListener('click', function() {
+        document.querySelectorAll('.toggle-option[data-value="not-last-floor"]').addEventListener('click', function() {
             this.classList.toggle('selected');
             filters.notLastFloor = this.classList.contains('selected');
         });
@@ -947,26 +984,20 @@
 
         // Сброс фильтров
         function resetFilters() {
-            // Сбросить все значения фильтров
             filters = {
                 rooms: [],
                 priceMin: null,
                 priceMax: null,
-                ownerOnly: false,
                 metroTime: null,
                 metroTransport: null,
                 districts: [],
-                amenities: [],
-                withChildren: false,
-                withPets: false,
+                options: [],
                 areaMin: null,
                 floorMin: null,
                 floorMax: null,
-                notLastFloor: false
+                renovation: []
             };
-            // Снять выделение со всех кнопок
             document.querySelectorAll('.filter-option, .toggle-option').forEach(btn => btn.classList.remove('selected'));
-            // Очистить все input
             document.querySelectorAll('input[type="number"]').forEach(inp => inp.value = '');
         }
 
@@ -984,30 +1015,90 @@
 
         // Оптимизация фильтров для парсера
         function optimizeFilters() {
-            const result = { ...filters };
-            const districts = [];
-            const areas = [];
-            // Округа без районов
-            okrugsWithoutAreas.forEach(okrug => {
-                if (filters.districts.includes(okrug)) {
-                    districts.push(okrug);
-                }
-            });
-            // Округа с районами
-            Object.keys(okrugsWithAreas).forEach(okrug => {
-                const okrugAreas = okrugsWithAreas[okrug];
-                const allSelected = okrugAreas.length > 0 && okrugAreas.every(area => filters.districts.includes(area));
-                if (allSelected) {
-                    districts.push(okrug);
-                } else {
-                    okrugAreas.forEach(area => {
-                        if (filters.districts.includes(area)) areas.push(area);
+            // Новый формат фильтров
+            const result = {};
+            // 1. Комнаты (массив чисел)
+            result.rooms = filters.rooms.map(Number).filter(n => !isNaN(n));
+            // 2. Цены
+            result.priceMin = filters.priceMin ? Number(filters.priceMin) : null;
+            result.priceMax = filters.priceMax ? Number(filters.priceMax) : null;
+            // 3. Время до метро
+            result.metroTime = filters.metroTime ? Number(filters.metroTime) : null;
+            // 4. Способ добраться до метро
+            result.metroTransport = filters.metroTransport ? Number(filters.metroTransport) : null;
+            // 5. Районы и округа — ids из districts_mapping, объединённые
+            // Для этого нужно получить mapping из districts_mapping.json
+            // Предполагаем, что okrugsWithAreas и okrugsWithoutAreas уже загружены
+            // и allAreasList [{area, okrug, id}]
+            let selectedDistrictIds = [];
+            // Собираем id для выбранных округов без районов
+            if (window.districtsMappingRaw) {
+                const mapping = window.districtsMappingRaw;
+                const mos = mapping["Москва"];
+                if (mos && mos.districts) {
+                    // Округа без районов
+                    Object.entries(mos.districts).forEach(([okrug, okrugData]) => {
+                        if (!okrugData.areas || Object.values(okrugData.areas).length === 0) {
+                            if (filters.districts.includes(okrug)) {
+                                if (okrugData.id) selectedDistrictIds.push(Number(okrugData.id));
+                            }
+                        } else {
+                            // Округа с районами
+                            Object.entries(okrugData.areas).forEach(([areaName, areaId]) => {
+                                if (filters.districts.includes(areaName)) {
+                                    selectedDistrictIds.push(Number(areaId));
+                                }
+                            });
+                            // Если выбран весь округ (все районы), добавлять id округа
+                            const allAreas = Object.values(okrugData.areas);
+                            const allSelected = allAreas.length > 0 && allAreas.every(area => filters.districts.includes(areaNameById(area, okrugData.areas)));
+                            if (allSelected && okrugData.id) {
+                                selectedDistrictIds.push(Number(okrugData.id));
+                            }
+                        }
                     });
                 }
-            });
-            result.districts = districts;
-            result.areas = areas;
+            }
+            result.districts = selectedDistrictIds;
+            // 6. Площадь
+            result.areaMin = filters.areaMin ? Number(filters.areaMin) : null;
+            // 7. Этажи
+            result.floorMin = filters.floorMin ? Number(filters.floorMin) : null;
+            result.floorMax = filters.floorMax ? Number(filters.floorMax) : null;
+            // 8. Тип ремонта (массив чисел)
+            result.renovation = filters.renovation.map(Number).filter(n => !isNaN(n));
+            // options — все булевы и строковые опции
+            result.options = filters.options.slice();
             return result;
+        }
+
+        // --- ДОБАВИТЬ: загрузку districts_mapping.json в window для optimizeFilters ---
+        fetch('districts_mapping.json')
+            .then(response => response.json())
+            .then(json => {
+                window.districtsMappingRaw = json;
+                // ... существующий код ...
+                okrugsWithAreas = {};
+                okrugsWithoutAreas = [];
+                const mos = json["Москва"];
+                if (mos && mos.districts) {
+                    Object.entries(mos.districts).forEach(([okrug, okrugData]) => {
+                        if (okrugData.areas && Object.values(okrugData.areas).length > 0) {
+                            okrugsWithAreas[okrug] = Object.values(okrugData.areas);
+                        } else {
+                            okrugsWithoutAreas.push(okrug);
+                        }
+                    });
+                }
+                buildDistrictsUI();
+            });
+
+        // --- ДОБАВИТЬ: функцию поиска имени района по id ---
+        function areaNameById(id, areasObj) {
+            for (const [name, areaId] of Object.entries(areasObj)) {
+                if (String(areaId) === String(id)) return name;
+            }
+            return null;
         }
     </script>
 </body>
