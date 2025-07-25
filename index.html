@@ -303,6 +303,25 @@
             border: 1px solid var(--tg-theme-hint-color, #999999);
             border-top: none;
         }
+        /* CSS для плавающего бейджа */
+        #floating-count-badge {
+            position: fixed;
+            left: 50%;
+            bottom: 18px;
+            transform: translateX(-50%);
+            background: var(--tg-theme-button-color, #2481cc);
+            color: var(--tg-theme-button-text-color, #fff);
+            border-radius: 18px;
+            padding: 7px 18px;
+            font-size: 15px;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+            z-index: 9999;
+            min-width: 60px;
+            text-align: center;
+            pointer-events: none;
+            opacity: 0.95;
+        }
     </style>
 </head>
 <body>
@@ -425,7 +444,10 @@
             </div>
         </div>
     </div>
-    
+
+    <!-- Плавающий бейдж количества объявлений -->
+    <div id="floating-count-badge" style="display:none;">🏠 0 найдено</div>
+
     <script src="https://telegram.org/js/telegram-web-app.js?58"></script>
     <script>
         // Инициализация Telegram Web App
