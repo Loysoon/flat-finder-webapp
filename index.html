@@ -642,9 +642,7 @@
         // Функция для обновления объекта filters на основе загруженных данных
         function updateFiltersFromLoaded(loadedFilters) {
             // Комнаты
-            if (loadedFilters.rooms && Array.isArray(loadedFilters.rooms)) {
-                filters.rooms = loadedFilters.rooms;
-            }
+            filters.rooms = (loadedFilters.rooms && Array.isArray(loadedFilters.rooms)) ? loadedFilters.rooms : [];
 
             // Цены
             filters.priceMin = loadedFilters.priceMin || null;
@@ -683,9 +681,13 @@
             filters.withPets = loadedFilters.options && loadedFilters.options.includes('pets') || false;
 
             // Тип ремонта
-            filters.renovation = loadedFilters.renovation && Array.isArray(loadedFilters.renovation) ? loadedFilters.renovation : [];
+            filters.renovation = (loadedFilters.renovation && Array.isArray(loadedFilters.renovation)) ? loadedFilters.renovation : [];
 
             // Округа и районы обрабатываются отдельно в applyLoadedDistricts
+            // Очищаем districts, если они не пришли в loadedFilters
+            if (!loadedFilters.districts || !Array.isArray(loadedFilters.districts)) {
+                filters.districts = [];
+            }
         }
 
         // Обработчики для кнопок комнат (множественный выбор)
