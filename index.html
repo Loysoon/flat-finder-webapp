@@ -336,8 +336,8 @@
         <div class="filter-group">
             <h3>💰 Ценовой диапазон</h3>
             <div class="price-inputs">
-                <input type="number" id="price-min" placeholder="От (руб.)" min="0">
-                <input type="number" id="price-max" placeholder="До (руб.)" min="0">
+                <input type="text" id="price-min" placeholder="От (руб.)" inputmode="numeric">
+                <input type="text" id="price-max" placeholder="До (руб.)" inputmode="numeric">
             </div>
         </div>
 
@@ -433,6 +433,133 @@
         tg.ready();
         tg.expand();
 
+        // Функция для получения параметров из URL
+        function getUrlParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // Функция для загрузки фильтров из URL
+        function loadFiltersFromUrl() {
+            const filtersParam = getUrlParameter('filters');
+            if (filtersParam) {
+                try {
+                    const decodedFilters = decodeURIComponent(filtersParam);
+                    const loadedFilters = JSON.parse(decodedFilters);
+                    
+                    // Применяем загруженные фильтры к форме
+                    applyFiltersToForm(loadedFilters);
+                    
+                    // Обновляем объект filters
+                    updateFiltersFromLoaded(loadedFilters);
+                    
+                    console.log('Фильтры загружены из URL:', loadedFilters);
+                } catch (error) {
+                    console.error('Ошибка при загрузке фильтров из URL:', error);
+                }
+            }
+        }
+
+        // Функция для применения фильтров к форме
+        function applyFiltersToForm(loadedFilters) {
+            // Комнаты
+            if (loadedFilters.rooms && Array.isArray(loadedFilters.rooms)) {
+                loadedFilters.rooms.forEach(room => {
+                    const roomBtn = document.querySelector(`#rooms .filter-option[data-value="${room}"]`);
+                    if (roomBtn) {
+                        roomBtn.classList.add('selected');
+                    }
+                });
+            }
+
+            // Цены
+            if (loadedFilters.priceMin) {
+                document.getElementById('price-min').value = formatNumberWithSpaces(loadedFilters.priceMin.toString());
+            }
+            if (loadedFilters.priceMax) {
+                document.getElementById('price-max').value = formatNumberWithSpaces(loadedFilters.priceMax.toString());
+            }
+
+            // Собственник
+            if (loadedFilters.options && loadedFilters.options.includes('is_by_homeowner')) {
+                document.getElementById('owner-only').classList.add('selected');
+            }
+
+            // Время до метро
+            if (loadedFilters.metroTime) {
+                document.getElementById('metro-time').value = loadedFilters.metroTime;
+                // Активируем кнопки транспорта
+                document.querySelectorAll('#metro-transport .filter-option').forEach(btn => {
+                    btn.disabled = false;
+                });
+            }
+
+            // Способ до метро
+            if (loadedFilters.metroTransport) {
+                const transportBtn = document.querySelector(`#metro-transport .filter-option[data-value="${loadedFilters.metroTransport}"]`);
+                if (transportBtn) {
+                    transportBtn.classList.add('selected');
+                }
+            }
+
+            // Площадь
+            if (loadedFilters.areaMin) {
+                document.getElementById('area-min').value = loadedFilters.areaMin;
+            }
+
+            // Этажи
+            if (loadedFilters.floorMin) {
+                document.getElementById('floor-min').value = loadedFilters.floorMin;
+            }
+            if (loadedFilters.floorMax) {
+                document.getElementById('floor-max').value = loadedFilters.floorMax;
+            }
+
+            // Не последний этаж
+            if (loadedFilters.options && loadedFilters.options.includes('floornl')) {
+                document.getElementById('not-last-floor').classList.add('selected');
+            }
+
+            // Удобства
+            if (loadedFilters.options && Array.isArray(loadedFilters.options)) {
+                const amenities = ['conditioner', 'rfgr', 'dish_washer', 'wm', 'internet', 'tv'];
+                amenities.forEach(amenity => {
+                    if (loadedFilters.options.includes(amenity)) {
+                        const amenityBtn = document.querySelector(`#amenities .filter-option[data-value="${amenity}"]`);
+                        if (amenityBtn) {
+                            amenityBtn.classList.add('selected');
+                        }
+                    }
+                });
+            }
+
+            // Условия проживания
+            if (loadedFilters.options && Array.isArray(loadedFilters.options)) {
+                if (loadedFilters.options.includes('kids')) {
+                    document.getElementById('with-children').classList.add('selected');
+                }
+                if (loadedFilters.options.includes('pets')) {
+                    document.getElementById('with-pets').classList.add('selected');
+                }
+            }
+
+            // Тип ремонта
+            if (loadedFilters.renovation && Array.isArray(loadedFilters.renovation)) {
+                loadedFilters.renovation.forEach(renovation => {
+                    const renovationBtn = document.querySelector(`#renovation-types .filter-option[data-value="${renovation}"]`);
+                    if (renovationBtn) {
+                        renovationBtn.classList.add('selected');
+                    }
+                });
+            }
+
+            // Округа и районы - обрабатываем после загрузки districts_mapping.json
+            if (loadedFilters.districts && Array.isArray(loadedFilters.districts)) {
+                // Сохраняем districts для последующей обработки
+                window.loadedDistricts = loadedFilters.districts;
+            }
+        }
+
         // Данные фильтров
         let filters = {
             rooms: [],
@@ -451,6 +578,60 @@
             notLastFloor: false,
             renovation: []
         };
+
+        // Загружаем фильтры при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFiltersFromUrl();
+        });
+
+        // Функция для обновления объекта filters на основе загруженных данных
+        function updateFiltersFromLoaded(loadedFilters) {
+            // Комнаты
+            if (loadedFilters.rooms && Array.isArray(loadedFilters.rooms)) {
+                filters.rooms = loadedFilters.rooms;
+            }
+
+            // Цены
+            filters.priceMin = loadedFilters.priceMin || null;
+            filters.priceMax = loadedFilters.priceMax || null;
+
+            // Собственник
+            filters.ownerOnly = loadedFilters.options && loadedFilters.options.includes('is_by_homeowner') || false;
+
+            // Время до метро
+            filters.metroTime = loadedFilters.metroTime || null;
+            filters.metroTransport = loadedFilters.metroTransport || null;
+
+            // Площадь
+            filters.areaMin = loadedFilters.areaMin || null;
+
+            // Этажи
+            filters.floorMin = loadedFilters.floorMin || null;
+            filters.floorMax = loadedFilters.floorMax || null;
+
+            // Не последний этаж
+            filters.notLastFloor = loadedFilters.options && loadedFilters.options.includes('floornl') || false;
+
+            // Удобства
+            filters.amenities = [];
+            if (loadedFilters.options && Array.isArray(loadedFilters.options)) {
+                const amenities = ['conditioner', 'rfgr', 'dish_washer', 'wm', 'internet', 'tv'];
+                amenities.forEach(amenity => {
+                    if (loadedFilters.options.includes(amenity)) {
+                        filters.amenities.push(amenity);
+                    }
+                });
+            }
+
+            // Условия проживания
+            filters.withChildren = loadedFilters.options && loadedFilters.options.includes('kids') || false;
+            filters.withPets = loadedFilters.options && loadedFilters.options.includes('pets') || false;
+
+            // Тип ремонта
+            filters.renovation = loadedFilters.renovation && Array.isArray(loadedFilters.renovation) ? loadedFilters.renovation : [];
+
+            // Округа и районы обрабатываются отдельно в applyLoadedDistricts
+        }
 
         // Обработчики для кнопок комнат (множественный выбор)
         document.querySelectorAll('#rooms .filter-option').forEach(btn => {
@@ -484,11 +665,24 @@
                     });
                 }
                 buildDistrictsUI();
+                
+                // Применяем загруженные округа и районы после загрузки mapping
+                if (window.loadedDistricts) {
+                    applyLoadedDistricts(window.loadedDistricts);
+                    // Перестраиваем UI с примененными фильтрами
+                    buildDistrictsUI();
+                }
             });
 
         function buildDistrictsUI() {
             const districtsList = document.getElementById('districts-list');
             districtsList.innerHTML = '';
+            
+            // Применяем загруженные округа и районы, если они есть
+            if (window.loadedDistricts && window.districtsMappingRaw) {
+                applyLoadedDistricts(window.loadedDistricts);
+            }
+            
             // Сначала округа с районами
             Object.keys(okrugsWithAreas).forEach(okrug => {
                 const areas = okrugsWithAreas[okrug];
@@ -648,6 +842,50 @@
                 districtsList.appendChild(okrugBlock);
             });
             updateAllAreasList();
+        }
+
+        // Функция для применения загруженных округов и районов
+        function applyLoadedDistricts(loadedDistricts) {
+            if (!window.districtsMappingRaw) return;
+            
+            const mapping = window.districtsMappingRaw;
+            const mos = mapping["Москва"];
+            if (!mos || !mos.districts) return;
+            
+            // Очищаем текущие фильтры округов
+            filters.districts = [];
+            
+            // Обрабатываем каждый ID из загруженных districts
+            loadedDistricts.forEach(districtId => {
+                // Ищем округ по ID
+                Object.entries(mos.districts).forEach(([okrugName, okrugData]) => {
+                    if (okrugData.id == districtId) {
+                        // Это округ
+                        if (okrugData.areas && Object.values(okrugData.areas).length > 0) {
+                            // Округ с районами - добавляем все районы
+                            Object.values(okrugData.areas).forEach(areaName => {
+                                if (!filters.districts.includes(areaName)) {
+                                    filters.districts.push(areaName);
+                                }
+                            });
+                        } else {
+                            // Округ без районов
+                            if (!filters.districts.includes(okrugName)) {
+                                filters.districts.push(okrugName);
+                            }
+                        }
+                    } else if (okrugData.areas) {
+                        // Ищем район по ID
+                        Object.entries(okrugData.areas).forEach(([areaId, areaName]) => {
+                            if (areaId == districtId) {
+                                if (!filters.districts.includes(areaName)) {
+                                    filters.districts.push(areaName);
+                                }
+                            }
+                        });
+                    }
+                });
+            });
         }
 
         // --- Поиск по районам с логами ---
@@ -824,20 +1062,71 @@
             }
         });
 
+        // Функция для форматирования числа с пробелами
+        function formatNumberWithSpaces(value) {
+            // Убираем все нецифровые символы
+            const numbers = value.replace(/\D/g, '');
+            // Добавляем пробелы каждые 3 цифры справа налево
+            return numbers.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+        }
+
+        // Функция для получения числового значения из форматированной строки
+        function getNumericValue(formattedValue) {
+            return parseInt(formattedValue.replace(/\s/g, ''), 10);
+        }
+
+        // Функция для проверки, содержит ли строка только цифры и пробелы
+        function containsOnlyDigitsAndSpaces(value) {
+            return /^[\d\s]*$/.test(value);
+        }
+
         // Цена
         const priceMinInput = document.getElementById('price-min');
         const priceMaxInput = document.getElementById('price-max');
+        
         priceMinInput.addEventListener('input', function() {
-            let val = parseInt(this.value, 10);
-            if (!isNaN(val)) {
-                filters.priceMin = val;
+            // Сохраняем позицию курсора
+            const cursorPos = this.selectionStart;
+            const oldValue = this.value;
+            
+            // Проверяем, содержит ли ввод только цифры и пробелы
+            if (!containsOnlyDigitsAndSpaces(this.value)) {
+                // Если введены некорректные символы, показываем кратковременную ошибку
+                this.classList.add('input-error');
+                setTimeout(() => {
+                    this.classList.remove('input-error');
+                }, 500);
+            }
+            
+            // Форматируем значение
+            const formattedValue = formatNumberWithSpaces(this.value);
+            this.value = formattedValue;
+            
+            // Восстанавливаем позицию курсора с учетом добавленных пробелов
+            let newCursorPos = cursorPos;
+            if (formattedValue.length > oldValue.length) {
+                // Подсчитываем количество добавленных пробелов до позиции курсора
+                const digitsBeforeCursor = oldValue.substring(0, cursorPos).replace(/\D/g, '').length;
+                let spacesAdded = 0;
+                for (let i = 0; i < formattedValue.length && i < cursorPos + spacesAdded; i++) {
+                    if (formattedValue[i] === ' ') spacesAdded++;
+                }
+                newCursorPos = cursorPos + spacesAdded;
+            }
+            this.setSelectionRange(newCursorPos, newCursorPos);
+            
+            // Обновляем фильтр
+            const numericValue = getNumericValue(formattedValue);
+            if (!isNaN(numericValue)) {
+                filters.priceMin = numericValue;
             } else {
                 filters.priceMin = null;
             }
         });
+        
         priceMinInput.addEventListener('blur', function() {
-            let val = parseInt(this.value, 10);
-            let maxVal = parseInt(priceMaxInput.value, 10);
+            let val = getNumericValue(this.value);
+            let maxVal = getNumericValue(priceMaxInput.value);
             if (isNaN(val) || val <= 0) {
                 this.value = '';
                 filters.priceMin = null;
@@ -851,17 +1140,50 @@
                 priceMaxInput.classList.remove('input-error');
             }
         });
+        
         priceMaxInput.addEventListener('input', function() {
-            let val = parseInt(this.value, 10);
-            if (!isNaN(val)) {
-                filters.priceMax = val;
+            // Сохраняем позицию курсора
+            const cursorPos = this.selectionStart;
+            const oldValue = this.value;
+            
+            // Проверяем, содержит ли ввод только цифры и пробелы
+            if (!containsOnlyDigitsAndSpaces(this.value)) {
+                // Если введены некорректные символы, показываем кратковременную ошибку
+                this.classList.add('input-error');
+                setTimeout(() => {
+                    this.classList.remove('input-error');
+                }, 500);
+            }
+            
+            // Форматируем значение
+            const formattedValue = formatNumberWithSpaces(this.value);
+            this.value = formattedValue;
+            
+            // Восстанавливаем позицию курсора с учетом добавленных пробелов
+            let newCursorPos = cursorPos;
+            if (formattedValue.length > oldValue.length) {
+                // Подсчитываем количество добавленных пробелов до позиции курсора
+                const digitsBeforeCursor = oldValue.substring(0, cursorPos).replace(/\D/g, '').length;
+                let spacesAdded = 0;
+                for (let i = 0; i < formattedValue.length && i < cursorPos + spacesAdded; i++) {
+                    if (formattedValue[i] === ' ') spacesAdded++;
+                }
+                newCursorPos = cursorPos + spacesAdded;
+            }
+            this.setSelectionRange(newCursorPos, newCursorPos);
+            
+            // Обновляем фильтр
+            const numericValue = getNumericValue(formattedValue);
+            if (!isNaN(numericValue)) {
+                filters.priceMax = numericValue;
             } else {
                 filters.priceMax = null;
             }
         });
+        
         priceMaxInput.addEventListener('blur', function() {
-            let val = parseInt(this.value, 10);
-            let minVal = parseInt(priceMinInput.value, 10);
+            let val = getNumericValue(this.value);
+            let minVal = getNumericValue(priceMinInput.value);
             if (isNaN(val) || val <= 0) {
                 this.value = '';
                 filters.priceMax = null;
@@ -951,8 +1273,8 @@
 
         // Блокируем сохранение фильтров, если есть ошибка в цене или этаже
         function saveFilters() {
-            const priceMin = parseInt(document.getElementById('price-min').value, 10);
-            const priceMax = parseInt(document.getElementById('price-max').value, 10);
+            const priceMin = getNumericValue(document.getElementById('price-min').value);
+            const priceMax = getNumericValue(document.getElementById('price-max').value);
             const floorMin = parseInt(document.getElementById('floor-min').value, 10);
             const floorMax = parseInt(document.getElementById('floor-max').value, 10);
             if (!isNaN(priceMin) && !isNaN(priceMax) && priceMax < priceMin) {
@@ -994,6 +1316,9 @@
             document.querySelectorAll('.filter-option, .toggle-option').forEach(btn => btn.classList.remove('selected'));
             // Очистить все input
             document.querySelectorAll('input[type="number"]').forEach(inp => inp.value = '');
+            // Очистить поля с ценами (они могут содержать пробелы)
+            document.getElementById('price-min').value = '';
+            document.getElementById('price-max').value = '';
         }
 
         // Модальное окно сброса фильтров
