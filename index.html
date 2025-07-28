@@ -433,188 +433,6 @@
         tg.ready();
         tg.expand();
 
-        // Функция для получения параметров из URL
-        function getUrlParameter(name) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(name);
-        }
-
-        // Функция для загрузки фильтров из URL
-        function loadFiltersFromUrl() {
-            const filtersParam = getUrlParameter('filters');
-            if (filtersParam) {
-                try {
-                    const decodedFilters = decodeURIComponent(filtersParam);
-                    const loadedFilters = JSON.parse(decodedFilters);
-                    
-                    // Применяем загруженные фильтры к форме
-                    applyFiltersToForm(loadedFilters);
-                    
-                    // Обновляем объект filters
-                    updateFiltersFromLoaded(loadedFilters);
-                    
-                    console.log('Фильтры загружены из URL:', loadedFilters);
-                } catch (error) {
-                    console.error('Ошибка при загрузке фильтров из URL:', error);
-                }
-            }
-        }
-
-        // Функция для очистки всех выборов
-        function clearAllSelections() {
-            // Очищаем все кнопки с классом selected
-            document.querySelectorAll('.filter-option.selected').forEach(btn => {
-                btn.classList.remove('selected');
-            });
-            
-            // Очищаем все toggle-option с классом selected
-            document.querySelectorAll('.toggle-option.selected').forEach(btn => {
-                btn.classList.remove('selected');
-            });
-            
-            // Очищаем все input поля
-            document.getElementById('price-min').value = '';
-            document.getElementById('price-max').value = '';
-            document.getElementById('metro-time').value = '';
-            document.getElementById('area-min').value = '';
-            document.getElementById('floor-min').value = '';
-            document.getElementById('floor-max').value = '';
-            
-            // Сбрасываем кнопки транспорта
-            document.querySelectorAll('#metro-transport .filter-option').forEach(btn => {
-                btn.classList.remove('selected');
-                btn.disabled = true;
-            });
-            
-            // Очищаем поиск районов
-            document.getElementById('area-search').value = '';
-            
-            // Очищаем объект filters
-            filters = {
-                rooms: [],
-                priceMin: null,
-                priceMax: null,
-                ownerOnly: false,
-                metroTime: null,
-                metroTransport: null,
-                districts: [],
-                amenities: [],
-                withChildren: false,
-                withPets: false,
-                areaMin: null,
-                floorMin: null,
-                floorMax: null,
-                notLastFloor: false,
-                renovation: []
-            };
-        }
-
-        // Функция для применения фильтров к форме
-        function applyFiltersToForm(loadedFilters) {
-            // Сначала очищаем все предыдущие выборы
-            clearAllSelections();
-            
-            // Комнаты
-            if (loadedFilters.rooms && Array.isArray(loadedFilters.rooms)) {
-                loadedFilters.rooms.forEach(room => {
-                    const roomBtn = document.querySelector(`#rooms .filter-option[data-value="${room}"]`);
-                    if (roomBtn) {
-                        roomBtn.classList.add('selected');
-                    }
-                });
-            }
-
-            // Цены
-            if (loadedFilters.priceMin) {
-                document.getElementById('price-min').value = formatNumberWithSpaces(loadedFilters.priceMin.toString());
-            }
-            if (loadedFilters.priceMax) {
-                document.getElementById('price-max').value = formatNumberWithSpaces(loadedFilters.priceMax.toString());
-            }
-
-            // Собственник
-            if (loadedFilters.options && loadedFilters.options.includes('is_by_homeowner')) {
-                document.getElementById('owner-only').classList.add('selected');
-            }
-
-            // Время до метро
-            if (loadedFilters.metroTime) {
-                document.getElementById('metro-time').value = loadedFilters.metroTime;
-                // Активируем кнопки транспорта
-                document.querySelectorAll('#metro-transport .filter-option').forEach(btn => {
-                    btn.disabled = false;
-                });
-            }
-
-            // Способ до метро
-            if (loadedFilters.metroTransport) {
-                const transportBtn = document.querySelector(`#metro-transport .filter-option[data-value="${loadedFilters.metroTransport}"]`);
-                if (transportBtn) {
-                    transportBtn.classList.add('selected');
-                }
-            }
-
-            // Площадь
-            if (loadedFilters.areaMin) {
-                document.getElementById('area-min').value = loadedFilters.areaMin;
-            }
-
-            // Этажи
-            if (loadedFilters.floorMin) {
-                document.getElementById('floor-min').value = loadedFilters.floorMin;
-            }
-            if (loadedFilters.floorMax) {
-                document.getElementById('floor-max').value = loadedFilters.floorMax;
-            }
-
-            // Не последний этаж
-            if (loadedFilters.options && loadedFilters.options.includes('floornl')) {
-                document.getElementById('not-last-floor').classList.add('selected');
-            }
-
-            // Удобства
-            if (loadedFilters.options && Array.isArray(loadedFilters.options)) {
-                const amenities = ['conditioner', 'rfgr', 'dish_washer', 'wm', 'internet', 'tv'];
-                amenities.forEach(amenity => {
-                    if (loadedFilters.options.includes(amenity)) {
-                        const amenityBtn = document.querySelector(`#amenities .filter-option[data-value="${amenity}"]`);
-                        if (amenityBtn) {
-                            amenityBtn.classList.add('selected');
-                        }
-                    }
-                });
-            }
-
-            // Условия проживания
-            if (loadedFilters.options && Array.isArray(loadedFilters.options)) {
-                if (loadedFilters.options.includes('kids')) {
-                    document.getElementById('with-children').classList.add('selected');
-                }
-                if (loadedFilters.options.includes('pets')) {
-                    document.getElementById('with-pets').classList.add('selected');
-                }
-            }
-
-            // Тип ремонта
-            if (loadedFilters.renovation && Array.isArray(loadedFilters.renovation)) {
-                loadedFilters.renovation.forEach(renovation => {
-                    const renovationBtn = document.querySelector(`#renovation-types .filter-option[data-value="${renovation}"]`);
-                    if (renovationBtn) {
-                        renovationBtn.classList.add('selected');
-                    }
-                });
-            }
-
-            // Округа и районы - обрабатываем после загрузки districts_mapping.json
-            if (loadedFilters.districts && Array.isArray(loadedFilters.districts)) {
-                // Сохраняем districts для последующей обработки
-                window.loadedDistricts = loadedFilters.districts;
-            }
-            
-            // Обновляем объект filters на основе загруженных данных
-            updateFiltersFromLoaded(loadedFilters);
-        }
-
         // Данные фильтров
         let filters = {
             rooms: [],
@@ -634,59 +452,133 @@
             renovation: []
         };
 
-        // Загружаем фильтры при загрузке страницы
-        document.addEventListener('DOMContentLoaded', function() {
-            loadFiltersFromUrl();
-        });
-
-        // Функция для обновления объекта filters на основе загруженных данных
-        function updateFiltersFromLoaded(loadedFilters) {
+        // Функция для загрузки фильтров из URL параметров
+        function loadFiltersFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            
             // Комнаты
-            filters.rooms = (loadedFilters.rooms && Array.isArray(loadedFilters.rooms)) ? loadedFilters.rooms : [];
-
+            const roomsParam = urlParams.get('rooms');
+            if (roomsParam) {
+                filters.rooms = roomsParam.split(',').map(r => r.trim());
+                // Обновляем UI
+                filters.rooms.forEach(room => {
+                    const btn = document.querySelector(`#rooms .filter-option[data-value="${room}"]`);
+                    if (btn) btn.classList.add('selected');
+                });
+            }
+            
             // Цены
-            filters.priceMin = loadedFilters.priceMin || null;
-            filters.priceMax = loadedFilters.priceMax || null;
-
-            // Собственник
-            filters.ownerOnly = loadedFilters.options && loadedFilters.options.includes('is_by_homeowner') || false;
-
+            const priceMin = urlParams.get('priceMin');
+            if (priceMin) {
+                filters.priceMin = parseInt(priceMin);
+                document.getElementById('price-min').value = formatNumberWithSpaces(priceMin);
+            }
+            
+            const priceMax = urlParams.get('priceMax');
+            if (priceMax) {
+                filters.priceMax = parseInt(priceMax);
+                document.getElementById('price-max').value = formatNumberWithSpaces(priceMax);
+            }
+            
             // Время до метро
-            filters.metroTime = loadedFilters.metroTime || null;
-            filters.metroTransport = loadedFilters.metroTransport || null;
-
+            const metroTime = urlParams.get('metroTime');
+            if (metroTime) {
+                filters.metroTime = parseInt(metroTime);
+                document.getElementById('metro-time').value = metroTime;
+                // Активируем кнопки транспорта
+                document.querySelectorAll('#metro-transport .filter-option').forEach(btn => {
+                    btn.disabled = false;
+                });
+            }
+            
+            const metroTransport = urlParams.get('metroTransport');
+            if (metroTransport) {
+                filters.metroTransport = metroTransport;
+                const btn = document.querySelector(`#metro-transport .filter-option[data-value="${metroTransport}"]`);
+                if (btn) btn.classList.add('selected');
+            }
+            
             // Площадь
-            filters.areaMin = loadedFilters.areaMin || null;
-
+            const areaMin = urlParams.get('areaMin');
+            if (areaMin) {
+                filters.areaMin = parseInt(areaMin);
+                document.getElementById('area-min').value = areaMin;
+            }
+            
             // Этажи
-            filters.floorMin = loadedFilters.floorMin || null;
-            filters.floorMax = loadedFilters.floorMax || null;
-
-            // Не последний этаж
-            filters.notLastFloor = loadedFilters.options && loadedFilters.options.includes('floornl') || false;
-
-            // Удобства
-            filters.amenities = [];
-            if (loadedFilters.options && Array.isArray(loadedFilters.options)) {
-                const amenities = ['conditioner', 'rfgr', 'dish_washer', 'wm', 'internet', 'tv'];
-                amenities.forEach(amenity => {
-                    if (loadedFilters.options.includes(amenity)) {
-                        filters.amenities.push(amenity);
+            const floorMin = urlParams.get('floorMin');
+            if (floorMin) {
+                filters.floorMin = parseInt(floorMin);
+                document.getElementById('floor-min').value = floorMin;
+            }
+            
+            const floorMax = urlParams.get('floorMax');
+            if (floorMax) {
+                filters.floorMax = parseInt(floorMax);
+                document.getElementById('floor-max').value = floorMax;
+            }
+            
+            // Тип ремонта
+            const renovationParam = urlParams.get('renovation');
+            if (renovationParam) {
+                filters.renovation = renovationParam.split(',').map(r => r.trim());
+                filters.renovation.forEach(renovation => {
+                    const btn = document.querySelector(`#renovation-types .filter-option[data-value="${renovation}"]`);
+                    if (btn) btn.classList.add('selected');
+                });
+            }
+            
+            // Опции
+            const optionsParam = urlParams.get('options');
+            if (optionsParam) {
+                const options = optionsParam.split(',').map(o => o.trim());
+                options.forEach(option => {
+                    if (option === 'is_by_homeowner') {
+                        filters.ownerOnly = true;
+                        document.getElementById('owner-only').classList.add('selected');
+                    } else if (option === 'kids') {
+                        filters.withChildren = true;
+                        document.getElementById('with-children').classList.add('selected');
+                    } else if (option === 'pets') {
+                        filters.withPets = true;
+                        document.getElementById('with-pets').classList.add('selected');
+                    } else if (option === 'floornl') {
+                        filters.notLastFloor = true;
+                        document.getElementById('not-last-floor').classList.add('selected');
+                    } else {
+                        // Удобства
+                        filters.amenities.push(option);
+                        const btn = document.querySelector(`#amenities .filter-option[data-value="${option}"]`);
+                        if (btn) btn.classList.add('selected');
                     }
                 });
             }
-
-            // Условия проживания
-            filters.withChildren = loadedFilters.options && loadedFilters.options.includes('kids') || false;
-            filters.withPets = loadedFilters.options && loadedFilters.options.includes('pets') || false;
-
-            // Тип ремонта
-            filters.renovation = (loadedFilters.renovation && Array.isArray(loadedFilters.renovation)) ? loadedFilters.renovation : [];
-
-            // Округа и районы обрабатываются отдельно в applyLoadedDistricts
-            // Очищаем districts, если они не пришли в loadedFilters
-            if (!loadedFilters.districts || !Array.isArray(loadedFilters.districts)) {
-                filters.districts = [];
+            
+            // Булевые опции
+            if (urlParams.get('ownerOnly') === 'true') {
+                filters.ownerOnly = true;
+                document.getElementById('owner-only').classList.add('selected');
+            }
+            
+            if (urlParams.get('withChildren') === 'true') {
+                filters.withChildren = true;
+                document.getElementById('with-children').classList.add('selected');
+            }
+            
+            if (urlParams.get('withPets') === 'true') {
+                filters.withPets = true;
+                document.getElementById('with-pets').classList.add('selected');
+            }
+            
+            if (urlParams.get('notLastFloor') === 'true') {
+                filters.notLastFloor = true;
+                document.getElementById('not-last-floor').classList.add('selected');
+            }
+            
+            // Районы (обрабатываем после загрузки districts_mapping.json)
+            const districtsParam = urlParams.get('districts');
+            if (districtsParam) {
+                filters.districts = districtsParam.split(',').map(d => d.trim());
             }
         }
 
@@ -722,22 +614,45 @@
                     });
                 }
                 buildDistrictsUI();
-                
-                // Применяем загруженные округа и районы после загрузки mapping
-                if (window.loadedDistricts) {
-                    applyLoadedDistricts(window.loadedDistricts);
-                    // Перестраиваем UI с примененными фильтрами
-                    buildDistrictsUI();
-                }
+                // Загружаем фильтры из URL после построения UI
+                loadFiltersFromURL();
             });
 
         function buildDistrictsUI() {
             const districtsList = document.getElementById('districts-list');
             districtsList.innerHTML = '';
             
-            // Применяем загруженные округа и районы, если они есть
-            if (window.loadedDistricts && window.districtsMappingRaw) {
-                applyLoadedDistricts(window.loadedDistricts);
+            // Функция для сопоставления ID районов с названиями
+            function mapDistrictIdsToNames(districtIds) {
+                const mappedDistricts = [];
+                if (!window.districtsMappingRaw) return mappedDistricts;
+                
+                const mos = window.districtsMappingRaw["Москва"];
+                if (!mos || !mos.districts) return mappedDistricts;
+                
+                districtIds.forEach(districtId => {
+                    // Сначала проверяем округа
+                    Object.entries(mos.districts).forEach(([okrugName, okrugData]) => {
+                        if (okrugData.id && okrugData.id.toString() === districtId.toString()) {
+                            mappedDistricts.push(okrugName);
+                        }
+                        // Затем проверяем районы внутри округов
+                        if (okrugData.areas) {
+                            Object.entries(okrugData.areas).forEach(([areaId, areaName]) => {
+                                if (areaId.toString() === districtId.toString()) {
+                                    mappedDistricts.push(areaName);
+                                }
+                            });
+                        }
+                    });
+                });
+                return mappedDistricts;
+            }
+            
+            // Если есть загруженные районы из URL, сопоставляем их с названиями
+            if (filters.districts.length > 0) {
+                const mappedDistricts = mapDistrictIdsToNames(filters.districts);
+                filters.districts = mappedDistricts;
             }
             
             // Сначала округа с районами
@@ -899,50 +814,6 @@
                 districtsList.appendChild(okrugBlock);
             });
             updateAllAreasList();
-        }
-
-        // Функция для применения загруженных округов и районов
-        function applyLoadedDistricts(loadedDistricts) {
-            if (!window.districtsMappingRaw) return;
-            
-            const mapping = window.districtsMappingRaw;
-            const mos = mapping["Москва"];
-            if (!mos || !mos.districts) return;
-            
-            // Очищаем текущие фильтры округов
-            filters.districts = [];
-            
-            // Обрабатываем каждый ID из загруженных districts
-            loadedDistricts.forEach(districtId => {
-                // Ищем округ по ID
-                Object.entries(mos.districts).forEach(([okrugName, okrugData]) => {
-                    if (okrugData.id == districtId) {
-                        // Это округ
-                        if (okrugData.areas && Object.values(okrugData.areas).length > 0) {
-                            // Округ с районами - добавляем все районы
-                            Object.values(okrugData.areas).forEach(areaName => {
-                                if (!filters.districts.includes(areaName)) {
-                                    filters.districts.push(areaName);
-                                }
-                            });
-                        } else {
-                            // Округ без районов
-                            if (!filters.districts.includes(okrugName)) {
-                                filters.districts.push(okrugName);
-                            }
-                        }
-                    } else if (okrugData.areas) {
-                        // Ищем район по ID
-                        Object.entries(okrugData.areas).forEach(([areaId, areaName]) => {
-                            if (areaId == districtId) {
-                                if (!filters.districts.includes(areaName)) {
-                                    filters.districts.push(areaName);
-                                }
-                            }
-                        });
-                    }
-                });
-            });
         }
 
         // --- Поиск по районам с логами ---
