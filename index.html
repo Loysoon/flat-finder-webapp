@@ -664,16 +664,24 @@
                         }
                     });
                 }
+                buildDistrictsUI();
+                
                 // Применяем загруженные округа и районы после загрузки mapping
                 if (window.loadedDistricts) {
                     applyLoadedDistricts(window.loadedDistricts);
+                    // Перестраиваем UI с примененными фильтрами
+                    buildDistrictsUI();
                 }
-                buildDistrictsUI();
             });
 
         function buildDistrictsUI() {
             const districtsList = document.getElementById('districts-list');
             districtsList.innerHTML = '';
+            
+            // Применяем загруженные округа и районы, если они есть
+            if (window.loadedDistricts && window.districtsMappingRaw) {
+                applyLoadedDistricts(window.loadedDistricts);
+            }
             
             // Сначала округа с районами
             Object.keys(okrugsWithAreas).forEach(okrug => {
@@ -834,56 +842,6 @@
                 districtsList.appendChild(okrugBlock);
             });
             updateAllAreasList();
-            
-            // Обновляем состояние кнопок после применения загруженных фильтров
-            if (window.loadedDistricts && window.districtsMappingRaw) {
-                // Находим все кнопки округов и обновляем их состояние
-                document.querySelectorAll('.okrug-btn').forEach(okrugBtn => {
-                    const okrugName = okrugBtn.dataset.value;
-                    const areas = okrugsWithAreas[okrugName] || [];
-                    if (areas.length > 0) {
-                        const allSelected = areas.every(area => filters.districts.includes(area));
-                        if (allSelected) {
-                            okrugBtn.classList.add('selected');
-                        } else {
-                            okrugBtn.classList.remove('selected');
-                        }
-                        
-                        // Обновляем счетчик районов
-                        const countSpan = okrugBtn.querySelector('.area-count');
-                        if (countSpan) {
-                            const selectedCount = areas.filter(area => filters.districts.includes(area)).length;
-                            const total = areas.length;
-                            if (selectedCount > 0 && selectedCount < total) {
-                                function getAreaCountText(n) {
-                                    if (n === 1) return 'Выбран 1 район';
-                                    if (n >= 2 && n <= 4) return `Выбрано ${n} района`;
-                                    return `Выбрано ${n} районов`;
-                                }
-                                countSpan.textContent = ` (${getAreaCountText(selectedCount)})`;
-                            } else {
-                                countSpan.textContent = '';
-                            }
-                        }
-                    } else {
-                        if (filters.districts.includes(okrugName)) {
-                            okrugBtn.classList.add('selected');
-                        } else {
-                            okrugBtn.classList.remove('selected');
-                        }
-                    }
-                });
-                
-                // Находим все кнопки районов и обновляем их состояние
-                document.querySelectorAll('.area-btn').forEach(areaBtn => {
-                    const areaName = areaBtn.dataset.value;
-                    if (filters.districts.includes(areaName)) {
-                        areaBtn.classList.add('selected');
-                    } else {
-                        areaBtn.classList.remove('selected');
-                    }
-                });
-            }
         }
 
         // Функция для применения загруженных округов и районов
