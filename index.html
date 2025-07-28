@@ -460,8 +460,60 @@
             }
         }
 
+        // Функция для очистки всех выборов
+        function clearAllSelections() {
+            // Очищаем все кнопки с классом selected
+            document.querySelectorAll('.filter-option.selected').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            // Очищаем все toggle-option с классом selected
+            document.querySelectorAll('.toggle-option.selected').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            // Очищаем все input поля
+            document.getElementById('price-min').value = '';
+            document.getElementById('price-max').value = '';
+            document.getElementById('metro-time').value = '';
+            document.getElementById('area-min').value = '';
+            document.getElementById('floor-min').value = '';
+            document.getElementById('floor-max').value = '';
+            
+            // Сбрасываем кнопки транспорта
+            document.querySelectorAll('#metro-transport .filter-option').forEach(btn => {
+                btn.classList.remove('selected');
+                btn.disabled = true;
+            });
+            
+            // Очищаем поиск районов
+            document.getElementById('area-search').value = '';
+            
+            // Очищаем объект filters
+            filters = {
+                rooms: [],
+                priceMin: null,
+                priceMax: null,
+                ownerOnly: false,
+                metroTime: null,
+                metroTransport: null,
+                districts: [],
+                amenities: [],
+                withChildren: false,
+                withPets: false,
+                areaMin: null,
+                floorMin: null,
+                floorMax: null,
+                notLastFloor: false,
+                renovation: []
+            };
+        }
+
         // Функция для применения фильтров к форме
         function applyFiltersToForm(loadedFilters) {
+            // Сначала очищаем все предыдущие выборы
+            clearAllSelections();
+            
             // Комнаты
             if (loadedFilters.rooms && Array.isArray(loadedFilters.rooms)) {
                 loadedFilters.rooms.forEach(room => {
@@ -558,6 +610,9 @@
                 // Сохраняем districts для последующей обработки
                 window.loadedDistricts = loadedFilters.districts;
             }
+            
+            // Обновляем объект filters на основе загруженных данных
+            updateFiltersFromLoaded(loadedFilters);
         }
 
         // Данные фильтров
