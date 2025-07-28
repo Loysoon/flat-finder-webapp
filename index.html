@@ -452,134 +452,166 @@
             renovation: []
         };
 
-        // Функция для загрузки фильтров из URL параметров
-        function loadFiltersFromURL() {
+        // Функция для загрузки сохраненных фильтров из URL
+        function loadSavedFilters() {
             const urlParams = new URLSearchParams(window.location.search);
+            const filtersParam = urlParams.get('filters');
             
+            if (filtersParam) {
+                try {
+                    const savedFilters = JSON.parse(decodeURIComponent(filtersParam));
+                    console.log('Загружены сохраненные фильтры:', savedFilters);
+                    
+                    // Применяем сохраненные фильтры
+                    applySavedFilters(savedFilters);
+                } catch (e) {
+                    console.error('Ошибка при парсинге сохраненных фильтров:', e);
+                }
+            }
+        }
+
+        // Функция для применения сохраненных фильтров
+        function applySavedFilters(savedFilters) {
             // Комнаты
-            const roomsParam = urlParams.get('rooms');
-            if (roomsParam) {
-                filters.rooms = roomsParam.split(',').map(r => r.trim());
-                // Обновляем UI
-                filters.rooms.forEach(room => {
-                    const btn = document.querySelector(`#rooms .filter-option[data-value="${room}"]`);
-                    if (btn) btn.classList.add('selected');
+            if (savedFilters.rooms && Array.isArray(savedFilters.rooms)) {
+                filters.rooms = savedFilters.rooms.map(String);
+                document.querySelectorAll('#rooms .filter-option').forEach(btn => {
+                    if (filters.rooms.includes(btn.dataset.value)) {
+                        btn.classList.add('selected');
+                    }
                 });
             }
-            
+
             // Цены
-            const priceMin = urlParams.get('priceMin');
-            if (priceMin) {
-                filters.priceMin = parseInt(priceMin);
-                document.getElementById('price-min').value = formatNumberWithSpaces(priceMin);
+            if (savedFilters.priceMin) {
+                filters.priceMin = savedFilters.priceMin;
+                document.getElementById('price-min').value = formatNumberWithSpaces(savedFilters.priceMin.toString());
             }
-            
-            const priceMax = urlParams.get('priceMax');
-            if (priceMax) {
-                filters.priceMax = parseInt(priceMax);
-                document.getElementById('price-max').value = formatNumberWithSpaces(priceMax);
+            if (savedFilters.priceMax) {
+                filters.priceMax = savedFilters.priceMax;
+                document.getElementById('price-max').value = formatNumberWithSpaces(savedFilters.priceMax.toString());
             }
-            
+
+            // Собственник
+            if (savedFilters.options && savedFilters.options.includes('is_by_homeowner')) {
+                filters.ownerOnly = true;
+                document.getElementById('owner-only').classList.add('selected');
+            }
+
             // Время до метро
-            const metroTime = urlParams.get('metroTime');
-            if (metroTime) {
-                filters.metroTime = parseInt(metroTime);
-                document.getElementById('metro-time').value = metroTime;
+            if (savedFilters.metroTime) {
+                filters.metroTime = savedFilters.metroTime;
+                document.getElementById('metro-time').value = savedFilters.metroTime;
                 // Активируем кнопки транспорта
                 document.querySelectorAll('#metro-transport .filter-option').forEach(btn => {
                     btn.disabled = false;
                 });
             }
-            
-            const metroTransport = urlParams.get('metroTransport');
-            if (metroTransport) {
-                filters.metroTransport = metroTransport;
-                const btn = document.querySelector(`#metro-transport .filter-option[data-value="${metroTransport}"]`);
-                if (btn) btn.classList.add('selected');
-            }
-            
-            // Площадь
-            const areaMin = urlParams.get('areaMin');
-            if (areaMin) {
-                filters.areaMin = parseInt(areaMin);
-                document.getElementById('area-min').value = areaMin;
-            }
-            
-            // Этажи
-            const floorMin = urlParams.get('floorMin');
-            if (floorMin) {
-                filters.floorMin = parseInt(floorMin);
-                document.getElementById('floor-min').value = floorMin;
-            }
-            
-            const floorMax = urlParams.get('floorMax');
-            if (floorMax) {
-                filters.floorMax = parseInt(floorMax);
-                document.getElementById('floor-max').value = floorMax;
-            }
-            
-            // Тип ремонта
-            const renovationParam = urlParams.get('renovation');
-            if (renovationParam) {
-                filters.renovation = renovationParam.split(',').map(r => r.trim());
-                filters.renovation.forEach(renovation => {
-                    const btn = document.querySelector(`#renovation-types .filter-option[data-value="${renovation}"]`);
-                    if (btn) btn.classList.add('selected');
-                });
-            }
-            
-            // Опции
-            const optionsParam = urlParams.get('options');
-            if (optionsParam) {
-                const options = optionsParam.split(',').map(o => o.trim());
-                options.forEach(option => {
-                    if (option === 'is_by_homeowner') {
-                        filters.ownerOnly = true;
-                        document.getElementById('owner-only').classList.add('selected');
-                    } else if (option === 'kids') {
-                        filters.withChildren = true;
-                        document.getElementById('with-children').classList.add('selected');
-                    } else if (option === 'pets') {
-                        filters.withPets = true;
-                        document.getElementById('with-pets').classList.add('selected');
-                    } else if (option === 'floornl') {
-                        filters.notLastFloor = true;
-                        document.getElementById('not-last-floor').classList.add('selected');
-                    } else {
-                        // Удобства
-                        filters.amenities.push(option);
-                        const btn = document.querySelector(`#amenities .filter-option[data-value="${option}"]`);
-                        if (btn) btn.classList.add('selected');
+
+            // Способ до метро
+            if (savedFilters.metroTransport) {
+                filters.metroTransport = savedFilters.metroTransport;
+                document.querySelectorAll('#metro-transport .filter-option').forEach(btn => {
+                    if (btn.dataset.value == savedFilters.metroTransport) {
+                        btn.classList.add('selected');
                     }
                 });
             }
-            
-            // Булевые опции
-            if (urlParams.get('ownerOnly') === 'true') {
-                filters.ownerOnly = true;
-                document.getElementById('owner-only').classList.add('selected');
+
+            // Площадь
+            if (savedFilters.areaMin) {
+                filters.areaMin = savedFilters.areaMin;
+                document.getElementById('area-min').value = savedFilters.areaMin;
             }
-            
-            if (urlParams.get('withChildren') === 'true') {
-                filters.withChildren = true;
-                document.getElementById('with-children').classList.add('selected');
+
+            // Этажи
+            if (savedFilters.floorMin) {
+                filters.floorMin = savedFilters.floorMin;
+                document.getElementById('floor-min').value = savedFilters.floorMin;
             }
-            
-            if (urlParams.get('withPets') === 'true') {
-                filters.withPets = true;
-                document.getElementById('with-pets').classList.add('selected');
+            if (savedFilters.floorMax) {
+                filters.floorMax = savedFilters.floorMax;
+                document.getElementById('floor-max').value = savedFilters.floorMax;
             }
-            
-            if (urlParams.get('notLastFloor') === 'true') {
+
+            // Не последний этаж
+            if (savedFilters.options && savedFilters.options.includes('floornl')) {
                 filters.notLastFloor = true;
                 document.getElementById('not-last-floor').classList.add('selected');
             }
-            
-            // Районы (обрабатываем после загрузки districts_mapping.json)
-            const districtsParam = urlParams.get('districts');
-            if (districtsParam) {
-                filters.districts = districtsParam.split(',').map(d => d.trim());
+
+            // Тип ремонта
+            if (savedFilters.renovation && Array.isArray(savedFilters.renovation)) {
+                filters.renovation = savedFilters.renovation.map(String);
+                document.querySelectorAll('#renovation-types .filter-option').forEach(btn => {
+                    if (filters.renovation.includes(btn.dataset.value)) {
+                        btn.classList.add('selected');
+                    }
+                });
             }
+
+            // Удобства
+            if (savedFilters.options && Array.isArray(savedFilters.options)) {
+                const amenities = ['conditioner', 'rfgr', 'dish_washer', 'wm', 'internet', 'tv'];
+                amenities.forEach(amenity => {
+                    if (savedFilters.options.includes(amenity)) {
+                        filters.amenities.push(amenity);
+                        document.querySelectorAll('#amenities .filter-option').forEach(btn => {
+                            if (btn.dataset.value === amenity) {
+                                btn.classList.add('selected');
+                            }
+                        });
+                    }
+                });
+            }
+
+            // Условия проживания
+            if (savedFilters.options && Array.isArray(savedFilters.options)) {
+                if (savedFilters.options.includes('kids')) {
+                    filters.withChildren = true;
+                    document.getElementById('with-children').classList.add('selected');
+                }
+                if (savedFilters.options.includes('pets')) {
+                    filters.withPets = true;
+                    document.getElementById('with-pets').classList.add('selected');
+                }
+            }
+
+            // Районы и округа будут загружены после загрузки districts_mapping.json
+            if (savedFilters.districts && Array.isArray(savedFilters.districts)) {
+                // Сохраняем ID районов для применения после загрузки mapping
+                window.savedDistrictsIds = savedFilters.districts;
+            }
+        }
+
+        // Функция для применения сохраненных районов по ID
+        function applySavedDistricts(districtIds) {
+            if (!window.districtsMappingRaw) return;
+            
+            const mapping = window.districtsMappingRaw;
+            const mos = mapping["Москва"];
+            if (!mos || !mos.districts) return;
+            
+            districtIds.forEach(districtId => {
+                // Ищем округ по ID
+                Object.entries(mos.districts).forEach(([okrugName, okrugData]) => {
+                    if (okrugData.id == districtId) {
+                        // Это округ
+                        if (!filters.districts.includes(okrugName)) {
+                            filters.districts.push(okrugName);
+                        }
+                    } else if (okrugData.areas) {
+                        // Ищем район в округе
+                        Object.entries(okrugData.areas).forEach(([areaId, areaName]) => {
+                            if (areaId == districtId) {
+                                if (!filters.districts.includes(areaName)) {
+                                    filters.districts.push(areaName);
+                                }
+                            }
+                        });
+                    }
+                });
+            });
         }
 
         // Обработчики для кнопок комнат (множественный выбор)
@@ -614,45 +646,16 @@
                     });
                 }
                 buildDistrictsUI();
-                // Загружаем фильтры из URL после построения UI
-                loadFiltersFromURL();
             });
 
         function buildDistrictsUI() {
             const districtsList = document.getElementById('districts-list');
             districtsList.innerHTML = '';
             
-            // Функция для сопоставления ID районов с названиями
-            function mapDistrictIdsToNames(districtIds) {
-                const mappedDistricts = [];
-                if (!window.districtsMappingRaw) return mappedDistricts;
-                
-                const mos = window.districtsMappingRaw["Москва"];
-                if (!mos || !mos.districts) return mappedDistricts;
-                
-                districtIds.forEach(districtId => {
-                    // Сначала проверяем округа
-                    Object.entries(mos.districts).forEach(([okrugName, okrugData]) => {
-                        if (okrugData.id && okrugData.id.toString() === districtId.toString()) {
-                            mappedDistricts.push(okrugName);
-                        }
-                        // Затем проверяем районы внутри округов
-                        if (okrugData.areas) {
-                            Object.entries(okrugData.areas).forEach(([areaId, areaName]) => {
-                                if (areaId.toString() === districtId.toString()) {
-                                    mappedDistricts.push(areaName);
-                                }
-                            });
-                        }
-                    });
-                });
-                return mappedDistricts;
-            }
-            
-            // Если есть загруженные районы из URL, сопоставляем их с названиями
-            if (filters.districts.length > 0) {
-                const mappedDistricts = mapDistrictIdsToNames(filters.districts);
-                filters.districts = mappedDistricts;
+            // Применяем сохраненные районы если они есть
+            if (window.savedDistrictsIds && window.districtsMappingRaw) {
+                applySavedDistricts(window.savedDistrictsIds);
+                window.savedDistrictsIds = null; // Очищаем после применения
             }
             
             // Сначала округа с районами
@@ -1374,6 +1377,9 @@
                 }
                 buildDistrictsUI();
             });
+
+        // Загружаем сохраненные фильтры при загрузке страницы
+        loadSavedFilters();
     </script>
 </body>
 </html> 
