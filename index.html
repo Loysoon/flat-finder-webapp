@@ -1260,6 +1260,10 @@
             // Очистить поля с ценами (они могут содержать пробелы)
             document.getElementById('price-min').value = '';
             document.getElementById('price-max').value = '';
+            // Очистить счетчики выбранных районов
+            document.querySelectorAll('.area-count').forEach(span => {
+                span.textContent = '';
+            });
         }
 
         // Модальное окно сброса фильтров
