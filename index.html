@@ -750,6 +750,16 @@
                         areaBtns.push(areaBtn);
                         areaList.appendChild(areaBtn);
                     });
+                    // --- ДОБАВЛЕНО: если выбран весь округ, выделить все районы и округ ---
+                    if (filters.districts.includes(okrug)) {
+                        areas.forEach(area => {
+                            if (!filters.districts.includes(area)) {
+                                filters.districts.push(area);
+                            }
+                        });
+                        okrugBtn.classList.add('selected');
+                        areaBtns.forEach(btn => btn.classList.add('selected'));
+                    }
                     areasSection.appendChild(areaList);
                     okrugBlock.appendChild(areasSection);
                 }
