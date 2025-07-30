@@ -380,7 +380,7 @@
                 <!-- Линии метро и станции будут добавлены динамически -->
             </div>
             
-            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--tg-theme-hint-color, #999999);">
+            <div style="margin-top: 20px;">
                 <h4 style="margin: 0 0 10px 0; color: var(--tg-theme-text-color, #000000);">⏱️ Время до метро</h4>
                 <div class="metro-inputs" style="flex-direction: column; gap: 8px;">
                     <input type="number" id="metro-time" placeholder="Время (мин)" min="0">
@@ -633,7 +633,7 @@
             const mapping = window.metroMappingRaw;
             
             metroIds.forEach(metroId => {
-                // Ищем станцию в линиях (у линий нет ID, только у станций)
+                // Ищем станцию в линиях (теперь передаются только ID станций)
                 Object.entries(mapping).forEach(([lineName, lineData]) => {
                     if (lineData.stations) {
                         Object.entries(lineData.stations).forEach(([stationName, stationId]) => {
@@ -1673,31 +1673,36 @@
             result.metroTime = filters.metroTime ? Number(filters.metroTime) : null;
             // 4. Способ добраться до метро
             result.metroTransport = filters.metroTransport ? Number(filters.metroTransport) : null;
-            // 5. Метро — ids из moscow_metro_mapping, объединённые
-            const metroLines = [];
+            // 5. Метро — только ID станций
             const metroStations = [];
-            metroLinesWithoutStations.forEach(line => {
-                if (filters.metro.includes(line)) {
-                    metroLines.push(line);
-                }
-            });
+            
+            // Обрабатываем линии без станций (они не передаются, так как у них нет станций)
+            // metroLinesWithoutStations.forEach(line => {
+            //     if (filters.metro.includes(line)) {
+            //         // Линии без станций не передаются
+            //     }
+            // });
+            
+            // Обрабатываем линии со станциями
             Object.keys(metroLinesWithStations).forEach(line => {
                 const lineStations = metroLinesWithStations[line];
                 const allSelected = lineStations.length > 0 && lineStations.every(station => filters.metro.includes(station));
                 if (allSelected) {
-                    metroLines.push(line);
+                    // Если выбрана вся линия, добавляем все её станции
+                    lineStations.forEach(station => {
+                        if (!metroStations.includes(station)) metroStations.push(station);
+                    });
                 } else {
+                    // Если выбраны отдельные станции, добавляем только их
                     lineStations.forEach(station => {
                         if (filters.metro.includes(station)) metroStations.push(station);
                     });
                 }
             });
-            // metroLines и metroStations уже содержат названия
+            
+            // Конвертируем названия станций в ID
             if (window.metroMappingRaw) {
                 const mapping = window.metroMappingRaw;
-                // Линии: оставляем названия (у линий нет ID)
-                result.metro = metroLines.map(lineName => lineName);
-                // Станции: заменить названия на id
                 const stationIds = metroStations.map(stationName => {
                     let foundId = null;
                     Object.values(mapping).forEach(lineData => {
@@ -1709,8 +1714,7 @@
                     });
                     return foundId !== null ? foundId : stationName;
                 });
-                // Объединяем линии и станции
-                result.metro = result.metro.concat(stationIds);
+                result.metro = stationIds;
                 // Удаляем дубликаты (станции с пересадками могут иметь одинаковые ID)
                 result.metro = [...new Set(result.metro)];
             } else {
