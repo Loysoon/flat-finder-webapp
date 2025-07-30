@@ -205,12 +205,14 @@
             overflow: hidden;
             max-height: 0;
             opacity: 0;
-            transition: max-height 0.35s cubic-bezier(.4,0,.2,1), opacity 0.25s;
+            visibility: hidden;
+            transition: max-height 0.35s cubic-bezier(.4,0,.2,1), opacity 0.25s, visibility 0.25s;
         }
         .areas-list-section.open {
             max-height: 500px;
             opacity: 1;
-            transition: max-height 0.5s cubic-bezier(.4,0,.2,1), opacity 0.3s;
+            visibility: visible;
+            transition: max-height 0.5s cubic-bezier(.4,0,.2,1), opacity 0.3s, visibility 0.3s;
         }
         .areas-toggle {
             background: var(--tg-theme-bg-color, #ffffff);
@@ -296,6 +298,11 @@
             background: rgba(36, 129, 204, 0.15) !important;
             color: var(--tg-theme-text-color, #000) !important;
             box-shadow: none !important;
+        }
+        
+        /* Отключаем взаимодействие с кнопками районов когда секция свернута */
+        .areas-list-section:not(.open) .filter-option {
+            pointer-events: none;
         }
         #area-suggest {
             width: calc(100% - 20px);
