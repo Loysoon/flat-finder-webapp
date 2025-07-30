@@ -703,7 +703,16 @@
                 metroLinesWithoutStations = [];
                 Object.entries(json).forEach(([lineName, lineData]) => {
                     if (lineData.stations && Object.keys(lineData.stations).length > 0) {
-                        metroLinesWithStations[lineName] = Object.keys(lineData.stations);
+                        // Фильтруем станции, у которых есть ID (не пустые)
+                        const stationsWithIds = Object.entries(lineData.stations)
+                            .filter(([stationName, stationId]) => stationId && stationId.trim() !== '')
+                            .map(([stationName, stationId]) => stationName);
+                        
+                        if (stationsWithIds.length > 0) {
+                            metroLinesWithStations[lineName] = stationsWithIds;
+                        } else {
+                            metroLinesWithoutStations.push(lineName);
+                        }
                     } else {
                         metroLinesWithoutStations.push(lineName);
                     }
@@ -1811,7 +1820,16 @@
                 metroLinesWithoutStations = [];
                 Object.entries(json).forEach(([lineName, lineData]) => {
                     if (lineData.stations && Object.keys(lineData.stations).length > 0) {
-                        metroLinesWithStations[lineName] = Object.keys(lineData.stations);
+                        // Фильтруем станции, у которых есть ID (не пустые)
+                        const stationsWithIds = Object.entries(lineData.stations)
+                            .filter(([stationName, stationId]) => stationId && stationId.trim() !== '')
+                            .map(([stationName, stationId]) => stationName);
+                        
+                        if (stationsWithIds.length > 0) {
+                            metroLinesWithStations[lineName] = stationsWithIds;
+                        } else {
+                            metroLinesWithoutStations.push(lineName);
+                        }
                     } else {
                         metroLinesWithoutStations.push(lineName);
                     }
