@@ -372,13 +372,15 @@
 
         <div class="filter-group">
             <h3>🚇 Метро</h3>
-            <div style="margin-bottom: 12px; position:relative;">
-                <input id="metro-search" type="text" placeholder="Поиск станции метро..." class="styled-input" autocomplete="off">
-                <div id="metro-suggest" style="position:absolute; left:0; right:0; top:36px; background:var(--tg-theme-bg-color,#fff); z-index:10; border-radius:0 0 8px 8px; box-shadow:0 2px 8px rgba(0,0,0,0.08); display:none;"></div>
-            </div>
             <button class="toggle-option" id="metro-toggle" style="margin-bottom: 8px;">🚇 Выбрать станции метро</button>
-            <div id="metro-list" style="display: none;">
-                <!-- Линии метро и станции будут добавлены динамически -->
+            <div id="metro-search-container" style="display: none;">
+                <div style="margin-bottom: 12px; position:relative;">
+                    <input id="metro-search" type="text" placeholder="Поиск станции метро..." class="styled-input" autocomplete="off">
+                    <div id="metro-suggest" style="position:absolute; left:0; right:0; top:36px; background:var(--tg-theme-bg-color,#fff); z-index:10; border-radius:0 0 8px 8px; box-shadow:0 2px 8px rgba(0,0,0,0.08); display:none;"></div>
+                </div>
+                <div id="metro-list">
+                    <!-- Линии метро и станции будут добавлены динамически -->
+                </div>
             </div>
             
             <div style="margin-top: 20px;">
@@ -395,13 +397,15 @@
 
         <div class="filter-group">
             <h3>📍 Расположение</h3>
-            <div style="margin-bottom: 12px; position:relative;">
-                <input id="area-search" type="text" placeholder="Поиск района..." class="styled-input" autocomplete="off">
-                <div id="area-suggest" style="position:absolute; left:0; right:0; top:36px; background:var(--tg-theme-bg-color,#fff); z-index:10; border-radius:0 0 8px 8px; box-shadow:0 2px 8px rgba(0,0,0,0.08); display:none;"></div>
-            </div>
             <button class="toggle-option" id="districts-toggle" style="margin-bottom: 8px;">📍 Выбрать районы</button>
-            <div id="districts-list" style="display: none;">
-                <!-- Округа и ярлычки районов будут добавлены динамически -->
+            <div id="districts-search-container" style="display: none;">
+                <div style="margin-bottom: 12px; position:relative;">
+                    <input id="area-search" type="text" placeholder="Поиск района..." class="styled-input" autocomplete="off">
+                    <div id="area-suggest" style="position:absolute; left:0; right:0; top:36px; background:var(--tg-theme-bg-color,#fff); z-index:10; border-radius:0 0 8px 8px; box-shadow:0 2px 8px rgba(0,0,0,0.08); display:none;"></div>
+                </div>
+                <div id="districts-list">
+                    <!-- Округа и ярлычки районов будут добавлены динамически -->
+                </div>
             </div>
         </div>
 
@@ -1858,25 +1862,25 @@
 
         // Обработчики для кнопок-переключателей списков
         document.getElementById('metro-toggle').addEventListener('click', function() {
-            const metroList = document.getElementById('metro-list');
-            const isVisible = metroList.style.display !== 'none';
+            const metroContainer = document.getElementById('metro-search-container');
+            const isVisible = metroContainer.style.display !== 'none';
             if (isVisible) {
-                metroList.style.display = 'none';
+                metroContainer.style.display = 'none';
                 this.textContent = '🚇 Выбрать станции метро';
             } else {
-                metroList.style.display = 'block';
+                metroContainer.style.display = 'block';
                 this.textContent = '🚇 Скрыть станции метро';
             }
         });
 
         document.getElementById('districts-toggle').addEventListener('click', function() {
-            const districtsList = document.getElementById('districts-list');
-            const isVisible = districtsList.style.display !== 'none';
+            const districtsContainer = document.getElementById('districts-search-container');
+            const isVisible = districtsContainer.style.display !== 'none';
             if (isVisible) {
-                districtsList.style.display = 'none';
+                districtsContainer.style.display = 'none';
                 this.textContent = '📍 Выбрать районы';
             } else {
-                districtsList.style.display = 'block';
+                districtsContainer.style.display = 'block';
                 this.textContent = '📍 Скрыть районы';
             }
         });
