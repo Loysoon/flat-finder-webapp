@@ -222,7 +222,7 @@
             transition: max-height 0.35s cubic-bezier(.4,0,.2,1), opacity 0.25s, visibility 0.25s;
         }
         .areas-list-section.open, .stations-list-section.open {
-            max-height: 0px;
+            max-height: 100%;
             opacity: 1;
             visibility: visible;
             transition: max-height 0.5s cubic-bezier(.4,0,.2,1), opacity 0.3s, visibility 0.3s;
@@ -380,7 +380,7 @@
                 <!-- Линии метро и станции будут добавлены динамически -->
             </div>
             
-            <div style="margin-top: 0px;">
+            <div style="margin-top: 20px;">
                 <h4 style="margin: 0 0 10px 0; color: var(--tg-theme-text-color, #000000);">⏱️ Время до метро</h4>
                 <div class="metro-inputs" style="flex-direction: column; gap: 8px;">
                     <input type="number" id="metro-time" placeholder="Время (мин)" min="0">
