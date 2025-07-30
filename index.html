@@ -710,12 +710,10 @@
                         
                         if (stationsWithIds.length > 0) {
                             metroLinesWithStations[lineName] = stationsWithIds;
-                        } else {
-                            metroLinesWithoutStations.push(lineName);
                         }
-                    } else {
-                        metroLinesWithoutStations.push(lineName);
+                        // Если нет станций с ID, линия не добавляется никуда (скрывается)
                     }
+                    // Если нет станций вообще, линия тоже не добавляется (скрывается)
                 });
                 buildMetroUI();
             });
@@ -1827,12 +1825,10 @@
                         
                         if (stationsWithIds.length > 0) {
                             metroLinesWithStations[lineName] = stationsWithIds;
-                        } else {
-                            metroLinesWithoutStations.push(lineName);
                         }
-                    } else {
-                        metroLinesWithoutStations.push(lineName);
+                        // Если нет станций с ID, линия не добавляется никуда (скрывается)
                     }
+                    // Если нет станций вообще, линия тоже не добавляется (скрывается)
                 });
                 buildMetroUI();
             });
