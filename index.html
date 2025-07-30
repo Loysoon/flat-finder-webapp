@@ -138,14 +138,14 @@
             width: 100%;
             box-sizing: border-box;
         }
-        .okrug-block {
+        .okrug-block, .metro-block {
             width: 100%;
             margin-bottom: 18px;
             position: relative;
             display: flex;
             flex-direction: column;
         }
-        .okrug-row {
+        .okrug-row, .metro-row {
             display: flex;
             flex-direction: row;
             width: 100%;
@@ -155,7 +155,7 @@
             overflow: hidden;
             position: relative;
         }
-        .okrug-btn {
+        .okrug-btn, .metro-btn {
             flex: 1 1 0;
             min-width: 0;
             margin-bottom: 0;
@@ -168,7 +168,7 @@
             border-width: 1px;
             text-align: left;
         }
-        .areas-toggle {
+        .areas-toggle, .stations-toggle {
             flex: 0 0 80px;
             width: 80px;
             min-width: 0;
@@ -192,10 +192,10 @@
             box-sizing: border-box;
             border-width: 1px;
         }
-        .areas-toggle:hover {
+        .areas-toggle:hover, .stations-toggle:hover {
             background: rgba(36,129,204,0.07);
         }
-        .areas-list-section {
+        .areas-list-section, .stations-list-section {
             width: 100%;
             background: transparent;
             border-radius: 0 0 10px 10px;
@@ -208,29 +208,29 @@
             visibility: hidden;
             transition: max-height 0.35s cubic-bezier(.4,0,.2,1), opacity 0.25s, visibility 0.25s;
         }
-        .areas-list-section.open {
+        .areas-list-section.open, .stations-list-section.open {
             max-height: 500px;
             opacity: 1;
             visibility: visible;
             transition: max-height 0.5s cubic-bezier(.4,0,.2,1), opacity 0.3s, visibility 0.3s;
         }
-        .areas-toggle {
+        .areas-toggle, .stations-toggle {
             background: var(--tg-theme-bg-color, #ffffff);
             border: 1px solid var(--tg-theme-button-color, #2481cc);
             color: var(--tg-theme-button-color, #2481cc);
         }
-        .areas-toggle.selected, .areas-toggle:active {
+        .areas-toggle.selected, .areas-toggle:active, .stations-toggle.selected, .stations-toggle:active {
             background: var(--tg-theme-button-color, #2481cc);
             color: var(--tg-theme-button-text-color, #ffffff);
         }
-        .okrug-btn--single {
+        .okrug-btn--single, .metro-btn--single {
             border-radius: 10px;
             border-right: 1px solid var(--tg-theme-button-color, #2481cc);
             text-align: left;
             padding-left: 16px;
             flex: 1 1 0;
         }
-        .areas-toggle--empty {
+        .areas-toggle--empty, .stations-toggle--empty {
             position: absolute;
             right: 0;
             top: 0;
@@ -277,134 +277,6 @@
             font-weight: bold;
             margin-left: 5px;
         }
-        
-        /* CSS для карты метро */
-        .metro-map-container {
-            width: 100%;
-        }
-        
-        .metro-map-controls {
-            position: relative;
-            margin-bottom: 10px;
-        }
-        
-        .metro-suggestions {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: var(--tg-theme-bg-color, #ffffff);
-            border: 1px solid var(--tg-theme-hint-color, #999999);
-            border-top: none;
-            border-radius: 0 0 8px 8px;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 1000;
-            display: none;
-        }
-        
-        .metro-suggestion-item {
-            padding: 8px 12px;
-            cursor: pointer;
-            border-bottom: 1px solid var(--tg-theme-hint-color, #f0f0f0);
-            transition: background-color 0.2s;
-        }
-        
-        .metro-suggestion-item:hover {
-            background: var(--tg-theme-button-color, #2481cc);
-            color: var(--tg-theme-button-text-color, #ffffff);
-        }
-        
-        .metro-suggestion-item:last-child {
-            border-bottom: none;
-        }
-        
-        .metro-map-wrapper {
-            width: 100%;
-            height: 300px;
-            border: 1px solid var(--tg-theme-hint-color, #999999);
-            border-radius: 8px;
-            overflow: hidden;
-            margin-bottom: 10px;
-            position: relative;
-        }
-        
-        .metro-map {
-            width: 100%;
-            height: 100%;
-            background: #f8f9fa;
-            position: relative;
-            overflow: auto;
-        }
-        
-        .metro-map svg {
-            width: 100%;
-            height: 100%;
-            min-width: 800px;
-            min-height: 600px;
-        }
-        
-        .metro-station {
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .metro-station:hover {
-            opacity: 0.8;
-        }
-        
-        .metro-station.selected {
-            fill: var(--tg-theme-button-color, #2481cc) !important;
-            stroke: var(--tg-theme-button-text-color, #ffffff) !important;
-            stroke-width: 2 !important;
-        }
-        
-        .selected-stations {
-            margin-top: 10px;
-        }
-        
-        .selected-stations h4 {
-            margin: 0 0 8px 0;
-            font-size: 14px;
-            color: var(--tg-theme-hint-color, #999999);
-        }
-        
-        .selected-stations-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-        
-        .selected-station-tag {
-            background: var(--tg-theme-button-color, #2481cc);
-            color: var(--tg-theme-button-text-color, #ffffff);
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        
-        .selected-station-tag .remove-btn {
-            background: none;
-            border: none;
-            color: inherit;
-            cursor: pointer;
-            font-size: 14px;
-            padding: 0;
-            width: 16px;
-            height: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-        }
-        
-        .selected-station-tag .remove-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        
         /* CSS для поля поиска района */
         .styled-input {
             width: 100%;
@@ -430,6 +302,10 @@
         
         /* Отключаем взаимодействие с кнопками районов когда секция свернута */
         .areas-list-section:not(.open) .filter-option {
+            pointer-events: none;
+        }
+        /* Отключаем взаимодействие с кнопками станций когда секция свернута */
+        .stations-list-section:not(.open) .filter-option {
             pointer-events: none;
         }
         #area-suggest {
@@ -482,29 +358,23 @@
         </div>
 
         <div class="filter-group">
-            <h3>🚇 Время до метро</h3>
-            <div class="metro-inputs" style="flex-direction: column; gap: 8px;">
-                <input type="number" id="metro-time" placeholder="Время (мин)" min="0">
-                <div class="filter-options" id="metro-transport">
-                    <button class="filter-option" data-value="2">🚶 Пешком</button>
-                    <button class="filter-option" data-value="-2">🚌 Транспорт</button>
-                </div>
+            <h3>🚇 Метро</h3>
+            <div style="margin-bottom: 12px; position:relative;">
+                <input id="metro-search" type="text" placeholder="Поиск станции метро..." class="styled-input" autocomplete="off">
+                <div id="metro-suggest" style="position:absolute; left:0; right:0; top:36px; background:var(--tg-theme-bg-color,#fff); z-index:10; border-radius:0 0 8px 8px; box-shadow:0 2px 8px rgba(0,0,0,0.08); display:none;"></div>
             </div>
-        </div>
-
-        <div class="filter-group">
-            <h3>🚇 Станции метро</h3>
-            <div class="metro-map-container">
-                <div class="metro-map-controls">
-                    <input type="text" id="metro-search" placeholder="Поиск станции..." class="styled-input" autocomplete="off">
-                    <div id="metro-suggest" class="metro-suggestions"></div>
-                </div>
-                <div class="metro-map-wrapper">
-                    <div id="metro-map" class="metro-map"></div>
-                </div>
-                <div class="selected-stations">
-                    <h4>Выбранные станции:</h4>
-                    <div id="selected-stations-list"></div>
+            <div id="metro-list">
+                <!-- Линии метро и станции будут добавлены динамически -->
+            </div>
+            
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--tg-theme-hint-color, #999999);">
+                <h4 style="margin: 0 0 10px 0; color: var(--tg-theme-text-color, #000000);">⏱️ Время до метро</h4>
+                <div class="metro-inputs" style="flex-direction: column; gap: 8px;">
+                    <input type="number" id="metro-time" placeholder="Время (мин)" min="0">
+                    <div class="filter-options" id="metro-transport">
+                        <button class="filter-option" data-value="2">🚶 Пешком</button>
+                        <button class="filter-option" data-value="-2">🚌 Транспорт</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -593,7 +463,7 @@
             ownerOnly: false,
             metroTime: null,
             metroTransport: null,
-            metroStations: [],
+            metro: [],
             districts: [],
             amenities: [],
             withChildren: false,
@@ -671,13 +541,6 @@
                 });
             }
 
-            // Станции метро
-            if (savedFilters.metroStations && Array.isArray(savedFilters.metroStations)) {
-                filters.metroStations = savedFilters.metroStations;
-                // Применение выбранных станций будет выполнено после загрузки карты метро
-                window.savedMetroStations = savedFilters.metroStations;
-            }
-
             // Площадь
             if (savedFilters.areaMin) {
                 filters.areaMin = savedFilters.areaMin;
@@ -737,11 +600,39 @@
                 }
             }
 
+            // Метро будет загружено после загрузки moscow_metro_mapping.json
+            if (savedFilters.metro && Array.isArray(savedFilters.metro)) {
+                // Сохраняем ID станций метро для применения после загрузки mapping
+                window.savedMetroIds = savedFilters.metro;
+            }
+
             // Районы и округа будут загружены после загрузки districts_mapping.json
             if (savedFilters.districts && Array.isArray(savedFilters.districts)) {
                 // Сохраняем ID районов для применения после загрузки mapping
                 window.savedDistrictsIds = savedFilters.districts;
             }
+        }
+
+        // Функция для применения сохраненных станций метро по ID
+        function applySavedMetro(metroIds) {
+            if (!window.metroMappingRaw) return;
+            
+            const mapping = window.metroMappingRaw;
+            
+            metroIds.forEach(metroId => {
+                // Ищем станцию в линиях (у линий нет ID, только у станций)
+                Object.entries(mapping).forEach(([lineName, lineData]) => {
+                    if (lineData.stations) {
+                        Object.entries(lineData.stations).forEach(([stationName, stationId]) => {
+                            if (stationId == metroId) {
+                                if (!filters.metro.includes(stationName)) {
+                                    filters.metro.push(stationName);
+                                }
+                            }
+                        });
+                    }
+                });
+            });
         }
 
         // Функция для применения сохраненных районов по ID
@@ -786,6 +677,27 @@
             });
         });
 
+        // Загрузка линий метро и станций из moscow_metro_mapping.json
+        let metroLinesWithStations = {};
+        let metroLinesWithoutStations = [];
+
+        // Загрузка линий метро и станций из moscow_metro_mapping.json
+        fetch('moscow_metro_mapping.json')
+            .then(response => response.json())
+            .then(json => {
+                window.metroMappingRaw = json;
+                metroLinesWithStations = {};
+                metroLinesWithoutStations = [];
+                Object.entries(json).forEach(([lineName, lineData]) => {
+                    if (lineData.stations && Object.keys(lineData.stations).length > 0) {
+                        metroLinesWithStations[lineName] = Object.keys(lineData.stations);
+                    } else {
+                        metroLinesWithoutStations.push(lineName);
+                    }
+                });
+                buildMetroUI();
+            });
+
         // Загрузка округов и районов из districts_mapping.json
         let okrugsWithAreas = {};
         let okrugsWithoutAreas = [];
@@ -807,6 +719,187 @@
                 }
                 buildDistrictsUI();
             });
+
+        function buildMetroUI() {
+            const metroList = document.getElementById('metro-list');
+            metroList.innerHTML = '';
+            
+            // Применяем сохраненные станции метро если они есть
+            if (window.savedMetroIds && window.metroMappingRaw) {
+                applySavedMetro(window.savedMetroIds);
+                window.savedMetroIds = null; // Очищаем после применения
+            }
+            
+            // Сначала линии с станциями
+            Object.keys(metroLinesWithStations).forEach(line => {
+                const stations = metroLinesWithStations[line];
+                const lineBlock = document.createElement('div');
+                lineBlock.className = 'metro-block';
+                const lineRow = document.createElement('div');
+                lineRow.className = 'metro-row';
+                const lineBtn = document.createElement('button');
+                lineBtn.className = 'filter-option metro-btn';
+                lineBtn.dataset.value = line;
+                lineBtn.textContent = line;
+                // span для количества выбранных станций
+                const countSpan = document.createElement('span');
+                countSpan.className = 'area-count';
+                lineBtn.appendChild(countSpan);
+                let stationBtns = [];
+                lineBtn.addEventListener('click', function() {
+                    const allSelected = stations.every(station => filters.metro.includes(station));
+                    if (allSelected) {
+                        stations.forEach(station => {
+                            filters.metro = filters.metro.filter(s => s !== station);
+                        });
+                        lineBtn.classList.remove('selected');
+                        stationBtns.forEach(btn => btn.classList.remove('selected'));
+                    } else {
+                        stations.forEach(station => {
+                            if (!filters.metro.includes(station)) filters.metro.push(station);
+                        });
+                        lineBtn.classList.add('selected');
+                        stationBtns.forEach(btn => btn.classList.add('selected'));
+                    }
+                    updateLineBtn();
+                    updateStationCount();
+                });
+                let stationsSection = null;
+                if (stations.length > 0) {
+                    const stationsToggle = document.createElement('button');
+                    stationsToggle.className = 'stations-toggle';
+                    stationsToggle.innerHTML = 'Станции <span style="font-size:18px;">&#8595;</span>';
+                    stationsToggle.setAttribute('aria-label', 'Показать станции');
+                    stationsToggle.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        if (stationsSection) {
+                            const isOpen = stationsSection.classList.contains('open');
+                            if (isOpen) {
+                                stationsSection.classList.remove('open');
+                                stationsToggle.innerHTML = 'Станции <span style="font-size:18px;">&#8595;</span>';
+                            } else {
+                                stationsSection.classList.add('open');
+                                stationsToggle.innerHTML = 'Станции <span style="font-size:18px;">&#8593;</span>';
+                            }
+                        }
+                    });
+                    lineRow.appendChild(lineBtn);
+                    lineRow.appendChild(stationsToggle);
+                } else {
+                    lineRow.appendChild(lineBtn);
+                    const emptyToggle = document.createElement('div');
+                    emptyToggle.className = 'stations-toggle--empty';
+                    lineRow.appendChild(emptyToggle);
+                }
+                lineBlock.appendChild(lineRow);
+                if (stations.length > 0) {
+                    stationsSection = document.createElement('div');
+                    stationsSection.className = 'stations-list-section';
+                    const stationList = document.createElement('div');
+                    stationList.className = 'filter-options';
+                    stations.forEach(station => {
+                        const stationBtn = document.createElement('button');
+                        stationBtn.className = 'filter-option station-btn';
+                        stationBtn.dataset.value = station.trim();
+                        stationBtn.textContent = station;
+                        stationBtn.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            if (filters.metro.includes(station)) {
+                                filters.metro = filters.metro.filter(s => s !== station);
+                                stationBtn.classList.remove('selected');
+                            } else {
+                                filters.metro.push(station);
+                                stationBtn.classList.add('selected');
+                            }
+                            const allSelected = stations.every(s => filters.metro.includes(s));
+                            if (allSelected) {
+                                lineBtn.classList.add('selected');
+                            } else {
+                                lineBtn.classList.remove('selected');
+                            }
+                            updateStationCount();
+                        });
+                        stationBtns.push(stationBtn);
+                        stationList.appendChild(stationBtn);
+                    });
+                    // --- ДОБАВЛЕНО: если выбрана вся линия, выделить все станции и линию ---
+                    if (filters.metro.includes(line)) {
+                        stations.forEach(station => {
+                            if (!filters.metro.includes(station)) {
+                                filters.metro.push(station);
+                            }
+                        });
+                        lineBtn.classList.add('selected');
+                        stationBtns.forEach(btn => btn.classList.add('selected'));
+                    }
+                    stationsSection.appendChild(stationList);
+                    lineBlock.appendChild(stationsSection);
+                }
+                metroList.appendChild(lineBlock);
+                function updateLineBtn() {
+                    const allSelected = stations.every(station => filters.metro.includes(station));
+                    if (allSelected) {
+                        lineBtn.classList.add('selected');
+                    } else {
+                        lineBtn.classList.remove('selected');
+                    }
+                    stationBtns.forEach(btn => {
+                        if (filters.metro.includes(btn.dataset.value)) {
+                            btn.classList.add('selected');
+                        } else {
+                            btn.classList.remove('selected');
+                        }
+                    });
+                }
+                function getStationCountText(n) {
+                    if (n === 1) return 'Выбрана 1 станция';
+                    if (n >= 2 && n <= 4) return `Выбрано ${n} станции`;
+                    return `Выбрано ${n} станций`;
+                }
+                function updateStationCount() {
+                    const selectedCount = stations.filter(station => filters.metro.includes(station)).length;
+                    const total = stations.length;
+                    if (selectedCount > 0 && selectedCount < total) {
+                        countSpan.textContent = ` (${getStationCountText(selectedCount)})`;
+                    } else {
+                        countSpan.textContent = '';
+                    }
+                }
+                updateLineBtn();
+                updateStationCount();
+            });
+            // Теперь линии без станций
+            metroLinesWithoutStations.forEach(line => {
+                const lineBlock = document.createElement('div');
+                lineBlock.className = 'metro-block';
+                const lineRow = document.createElement('div');
+                lineRow.className = 'metro-row';
+                const lineBtn = document.createElement('button');
+                lineBtn.className = 'filter-option metro-btn metro-btn--single';
+                lineBtn.dataset.value = line;
+                lineBtn.textContent = line;
+                lineBtn.classList.remove('selected');
+                if (filters.metro.includes(line)) {
+                    lineBtn.classList.add('selected');
+                }
+                lineBtn.addEventListener('click', function() {
+                    if (filters.metro.includes(line)) {
+                        filters.metro = filters.metro.filter(s => s !== line);
+                        lineBtn.classList.remove('selected');
+                    } else {
+                        filters.metro.push(line);
+                        lineBtn.classList.add('selected');
+                    }
+                });
+                lineRow.appendChild(lineBtn);
+                const emptyToggle = document.createElement('div');
+                emptyToggle.className = 'stations-toggle--empty';
+                lineRow.appendChild(emptyToggle);
+                lineBlock.appendChild(lineRow);
+                metroList.appendChild(lineBlock);
+            });
+            updateAllMetroList();
+        }
 
         function buildDistrictsUI() {
             const districtsList = document.getElementById('districts-list');
@@ -989,6 +1082,19 @@
             updateAllAreasList();
         }
 
+        // --- Поиск по метро ---
+        let allMetroList = [];
+        function updateAllMetroList() {
+            allMetroList = [];
+            Object.keys(metroLinesWithStations).forEach(line => {
+                metroLinesWithStations[line].forEach(station => {
+                    allMetroList.push({ station, line });
+                });
+            });
+        }
+        // вызывать после buildMetroUI
+        updateAllMetroList();
+
         // --- Поиск по районам с логами ---
         let allAreasList = [];
         function updateAllAreasList() {
@@ -1001,6 +1107,41 @@
         }
         // вызывать после buildDistrictsUI
         updateAllAreasList();
+
+        const metroSearchInput = document.getElementById('metro-search');
+        const metroSuggest = document.getElementById('metro-suggest');
+        metroSearchInput.addEventListener('input', function() {
+            const val = this.value.trim().toLowerCase();
+            metroSuggest.innerHTML = '';
+            if (!val) {
+                metroSuggest.style.display = 'none';
+                return;
+            }
+            const found = allMetroList.filter(m => m.station.toLowerCase().includes(val));
+            if (found.length === 0) {
+                const item = document.createElement('div');
+                item.textContent = 'Ничего не найдено';
+                item.style.padding = '6px 12px';
+                item.style.color = '#888';
+                metroSuggest.appendChild(item);
+                metroSuggest.style.display = 'block';
+                return;
+            }
+            found.slice(0, 7).forEach(({ station, line }) => {
+                const item = document.createElement('div');
+                item.textContent = `${station} (${line})`;
+                item.style.padding = '6px 12px';
+                item.style.cursor = 'pointer';
+                item.addEventListener('mousedown', function(e) {
+                    e.preventDefault();
+                    metroSearchInput.value = '';
+                    metroSuggest.style.display = 'none';
+                    openLineAndHighlightStation(line, station);
+                });
+                metroSuggest.appendChild(item);
+            });
+            metroSuggest.style.display = 'block';
+        });
 
         const areaSearchInput = document.getElementById('area-search');
         const areaSuggest = document.getElementById('area-suggest');
@@ -1037,8 +1178,49 @@
             areaSuggest.style.display = 'block';
         });
         document.body.addEventListener('click', function(e) {
+            if (!metroSearchInput.contains(e.target)) metroSuggest.style.display = 'none';
             if (!areaSearchInput.contains(e.target)) areaSuggest.style.display = 'none';
         });
+
+        function openLineAndHighlightStation(line, station) {
+            const metroList = document.getElementById('metro-list');
+            const lineBlocks = metroList.querySelectorAll('.metro-block');
+            lineBlocks.forEach(block => {
+                const btn = block.querySelector('.metro-btn');
+                if (btn && btn.dataset.value === line) {
+                    const stationsToggle = block.querySelector('.stations-toggle');
+                    const stationsSection = block.querySelector('.stations-list-section');
+                    let wasClosed = false;
+                    if (stationsToggle && stationsSection && !stationsSection.classList.contains('open')) {
+                        stationsSection.classList.add('open');
+                        stationsToggle.innerHTML = 'Станции <span style="font-size:18px;">&#8593;</span>';
+                        wasClosed = true;
+                    }
+                    function scrollAndBlink() {
+                        const stationBtn = stationsSection.querySelector('.station-btn[data-value="' + station + '"]');
+                        if (stationBtn) {
+                            stationBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            let blinkCount = 0;
+                            function blink() {
+                                stationBtn.classList.toggle('area-highlight');
+                                blinkCount++;
+                                if (blinkCount < 10) { // 5 раз: 5 включений и 5 выключений
+                                    setTimeout(blink, 250);
+                                } else {
+                                    stationBtn.classList.remove('area-highlight');
+                                }
+                            }
+                            blink();
+                        }
+                    }
+                    if (wasClosed) {
+                        setTimeout(scrollAndBlink, 150);
+                    } else {
+                        scrollAndBlink();
+                    }
+                }
+            });
+        }
 
         function openOkrugAndHighlightArea(okrug, area) {
             const districtsList = document.getElementById('districts-list');
@@ -1403,7 +1585,7 @@
                 ownerOnly: false,
                 metroTime: null,
                 metroTransport: null,
-                metroStations: [],
+                metro: [],
                 districts: [],
                 amenities: [],
                 withChildren: false,
@@ -1452,7 +1634,51 @@
             result.metroTime = filters.metroTime ? Number(filters.metroTime) : null;
             // 4. Способ добраться до метро
             result.metroTransport = filters.metroTransport ? Number(filters.metroTransport) : null;
-            // 5. Районы и округа — ids из districts_mapping, объединённые
+            // 5. Метро — ids из moscow_metro_mapping, объединённые
+            const metroLines = [];
+            const metroStations = [];
+            metroLinesWithoutStations.forEach(line => {
+                if (filters.metro.includes(line)) {
+                    metroLines.push(line);
+                }
+            });
+            Object.keys(metroLinesWithStations).forEach(line => {
+                const lineStations = metroLinesWithStations[line];
+                const allSelected = lineStations.length > 0 && lineStations.every(station => filters.metro.includes(station));
+                if (allSelected) {
+                    metroLines.push(line);
+                } else {
+                    lineStations.forEach(station => {
+                        if (filters.metro.includes(station)) metroStations.push(station);
+                    });
+                }
+            });
+            // metroLines и metroStations уже содержат названия
+            if (window.metroMappingRaw) {
+                const mapping = window.metroMappingRaw;
+                // Линии: оставляем названия (у линий нет ID)
+                result.metro = metroLines.map(lineName => lineName);
+                // Станции: заменить названия на id
+                const stationIds = metroStations.map(stationName => {
+                    let foundId = null;
+                    Object.values(mapping).forEach(lineData => {
+                        if (lineData.stations) {
+                            Object.entries(lineData.stations).forEach(([name, stationId]) => {
+                                if (name === stationName) foundId = Number(stationId);
+                            });
+                        }
+                    });
+                    return foundId !== null ? foundId : stationName;
+                });
+                // Объединяем линии и станции
+                result.metro = result.metro.concat(stationIds);
+                // Удаляем дубликаты (станции с пересадками могут иметь одинаковые ID)
+                result.metro = [...new Set(result.metro)];
+            } else {
+                result.metro = [];
+            }
+
+            // 6. Районы и округа — ids из districts_mapping, объединённые
             // --- ВОССТАНОВИТЬ старую логику округов и районов ---
             const districts = [];
             const areas = [];
@@ -1503,14 +1729,14 @@
                 result.areas = [];
             }
             // --- оставить новую обработку остальных фильтров ---
-            // 6. Площадь
+            // 7. Площадь
             result.areaMin = filters.areaMin ? Number(filters.areaMin) : null;
-            // 7. Этажи
+            // 8. Этажи
             result.floorMin = filters.floorMin ? Number(filters.floorMin) : null;
             result.floorMax = filters.floorMax ? Number(filters.floorMax) : null;
-            // 8. Тип ремонта (массив чисел)
+            // 9. Тип ремонта (массив чисел)
             result.renovation = filters.renovation.map(Number).filter(n => !isNaN(n));
-            // 9. options — все булевые и строковые опции
+            // 10. options — все булевые и строковые опции
             let options = [];
             // Собственник
             if (filters.ownerOnly) options.push("is_by_homeowner");
@@ -1531,6 +1757,24 @@
             }
             return result;
         }
+
+        // --- ДОБАВИТЬ: загрузку moscow_metro_mapping.json в window для optimizeFilters ---
+        fetch('moscow_metro_mapping.json')
+            .then(response => response.json())
+            .then(json => {
+                window.metroMappingRaw = json;
+                // ... существующий код ...
+                metroLinesWithStations = {};
+                metroLinesWithoutStations = [];
+                Object.entries(json).forEach(([lineName, lineData]) => {
+                    if (lineData.stations && Object.keys(lineData.stations).length > 0) {
+                        metroLinesWithStations[lineName] = Object.keys(lineData.stations);
+                    } else {
+                        metroLinesWithoutStations.push(lineName);
+                    }
+                });
+                buildMetroUI();
+            });
 
         // --- ДОБАВИТЬ: загрузку districts_mapping.json в window для optimizeFilters ---
         fetch('districts_mapping.json')
@@ -1555,181 +1799,6 @@
 
         // Загружаем сохраненные фильтры при загрузке страницы
         loadSavedFilters();
-
-        // Инициализация карты метро
-        let metroMapping = {};
-        let selectedMetroStations = new Set();
-
-        // Загрузка данных метро
-        fetch('moscow_metro_mapping.json')
-            .then(response => response.json())
-            .then(json => {
-                metroMapping = json;
-                loadMetroMap();
-                setupMetroSearch();
-            })
-            .catch(error => {
-                console.error('Ошибка загрузки данных метро:', error);
-            });
-
-        // Загрузка карты метро
-        function loadMetroMap() {
-            fetch('moscow_metro_map.svg')
-                .then(response => response.text())
-                .then(svgContent => {
-                    const metroMapContainer = document.getElementById('metro-map');
-                    metroMapContainer.innerHTML = svgContent;
-                    
-                    // Добавляем обработчики для станций
-                    const stations = metroMapContainer.querySelectorAll('circle');
-                    stations.forEach(station => {
-                        station.classList.add('metro-station');
-                        station.addEventListener('click', function() {
-                            toggleMetroStation(this);
-                        });
-                    });
-                    
-                    // Применяем сохраненные станции метро
-                    if (window.savedMetroStations && Array.isArray(window.savedMetroStations)) {
-                        window.savedMetroStations.forEach(stationId => {
-                            selectedMetroStations.add(stationId);
-                            const stationElement = document.querySelector(`[data-station-id="${stationId}"]`);
-                            if (stationElement) {
-                                stationElement.classList.add('selected');
-                            }
-                        });
-                        updateSelectedStationsList();
-                        window.savedMetroStations = null; // Очищаем сохраненные данные
-                    }
-                })
-                .catch(error => {
-                    console.error('Ошибка загрузки карты метро:', error);
-                    document.getElementById('metro-map').innerHTML = '<div style="padding: 20px; text-align: center; color: #666;">Ошибка загрузки карты метро</div>';
-                });
-        }
-
-        // Переключение выбора станции метро
-        function toggleMetroStation(stationElement) {
-            const stationId = stationElement.getAttribute('data-station-id');
-            if (!stationId) return;
-
-            if (selectedMetroStations.has(stationId)) {
-                selectedMetroStations.delete(stationId);
-                stationElement.classList.remove('selected');
-            } else {
-                selectedMetroStations.add(stationId);
-                stationElement.classList.add('selected');
-            }
-            
-            updateSelectedStationsList();
-            updateFilters();
-        }
-
-        // Обновление списка выбранных станций
-        function updateSelectedStationsList() {
-            const container = document.getElementById('selected-stations-list');
-            container.innerHTML = '';
-            
-            selectedMetroStations.forEach(stationId => {
-                const stationName = metroMapping[stationId];
-                if (stationName) {
-                    const tag = document.createElement('div');
-                    tag.className = 'selected-station-tag';
-                    tag.innerHTML = `
-                        ${stationName}
-                        <button class="remove-btn" onclick="removeMetroStation('${stationId}')">&times;</button>
-                    `;
-                    container.appendChild(tag);
-                }
-            });
-        }
-
-        // Удаление станции из выбранных
-        function removeMetroStation(stationId) {
-            selectedMetroStations.delete(stationId);
-            const stationElement = document.querySelector(`[data-station-id="${stationId}"]`);
-            if (stationElement) {
-                stationElement.classList.remove('selected');
-            }
-            updateSelectedStationsList();
-            updateFilters();
-        }
-
-        // Настройка поиска по станциям метро
-        function setupMetroSearch() {
-            const searchInput = document.getElementById('metro-search');
-            const suggestionsContainer = document.getElementById('metro-suggest');
-            
-            searchInput.addEventListener('input', function() {
-                const query = this.value.toLowerCase().trim();
-                if (query.length < 2) {
-                    suggestionsContainer.style.display = 'none';
-                    return;
-                }
-                
-                const suggestions = Object.entries(metroMapping)
-                    .filter(([id, name]) => name.toLowerCase().includes(query))
-                    .slice(0, 10);
-                
-                if (suggestions.length > 0) {
-                    suggestionsContainer.innerHTML = suggestions.map(([id, name]) => 
-                        `<div class="metro-suggestion-item" onclick="selectMetroFromSearch('${id}')">${name}</div>`
-                    ).join('');
-                    suggestionsContainer.style.display = 'block';
-                } else {
-                    suggestionsContainer.style.display = 'none';
-                }
-            });
-            
-            // Скрыть подсказки при клике вне поля поиска
-            document.addEventListener('click', function(e) {
-                if (!searchInput.contains(e.target) && !suggestionsContainer.contains(e.target)) {
-                    suggestionsContainer.style.display = 'none';
-                }
-            });
-        }
-
-        // Выбор станции из поиска
-        function selectMetroFromSearch(stationId) {
-            selectedMetroStations.add(stationId);
-            const stationElement = document.querySelector(`[data-station-id="${stationId}"]`);
-            if (stationElement) {
-                stationElement.classList.add('selected');
-            }
-            
-            document.getElementById('metro-search').value = '';
-            document.getElementById('metro-suggest').style.display = 'none';
-            updateSelectedStationsList();
-            updateFilters();
-        }
-
-        // Обновление фильтров
-        function updateFilters() {
-            filters.metroStations = Array.from(selectedMetroStations);
-        }
-
-        // Добавляем metroStations в функцию сброса фильтров
-        const originalResetFilters = resetFilters;
-        resetFilters = function() {
-            originalResetFilters();
-            selectedMetroStations.clear();
-            updateSelectedStationsList();
-            document.querySelectorAll('.metro-station').forEach(station => {
-                station.classList.remove('selected');
-            });
-            document.getElementById('metro-search').value = '';
-            document.getElementById('metro-suggest').style.display = 'none';
-        };
-
-
-
-        // Добавляем metroStations в функцию оптимизации фильтров
-        const originalOptimizeFilters = optimizeFilters;
-        optimizeFilters = function() {
-            const result = originalOptimizeFilters();
-            result.metroStations = Array.from(selectedMetroStations);
-            return result;
-        };
     </script>
 </body>
 </html> 
