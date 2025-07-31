@@ -455,7 +455,16 @@
         </div>
 
         <div class="filter-group">
-            <h3>🆕 Новизна объявлений</h3>
+            <h3 style="display: flex; align-items: center; gap: 8px;">
+                🆕 Новизна объявлений
+                <div class="info-tooltip" style="position: relative; display: inline-block;">
+                    <span class="info-icon" style="cursor: pointer; color: #007bff; font-weight: bold; font-size: 16px;">ⓘ</span>
+                    <div class="tooltip-content" style="position: absolute; bottom: 125%; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 10px 14px; border-radius: 8px; font-size: 13px; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 1000; width: 280px; text-align: left; line-height: 1.4; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+                        При включении этого фильтра сначала будут отправлены 3 самых свежих объявления, а затем только те, что появились после начала поиска
+                        <div style="position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 6px solid transparent; border-top-color: #333;"></div>
+                    </div>
+                </div>
+            </h3>
             <button class="toggle-option" id="only-new" data-value="new">🆕 Только новые объявления</button>
         </div>
 
@@ -1622,6 +1631,35 @@
             this.classList.toggle('selected');
             filters.onlyNew = this.classList.contains('selected');
         });
+
+        // Обработчик для информационной кнопки с задержкой
+        let tooltipTimeout;
+        const infoIcon = document.querySelector('.info-icon');
+        const tooltipContent = document.querySelector('.tooltip-content');
+
+        if (infoIcon && tooltipContent) {
+            infoIcon.addEventListener('mouseenter', function() {
+                tooltipTimeout = setTimeout(() => {
+                    tooltipContent.style.opacity = '1';
+                    tooltipContent.style.visibility = 'visible';
+                }, 500); // Задержка 500мс
+            });
+
+            infoIcon.addEventListener('mouseleave', function() {
+                clearTimeout(tooltipTimeout);
+                tooltipContent.style.opacity = '0';
+                tooltipContent.style.visibility = 'hidden';
+            });
+
+            // Также скрываем тултип при клике вне его
+            document.addEventListener('click', function(event) {
+                if (!infoIcon.contains(event.target) && !tooltipContent.contains(event.target)) {
+                    clearTimeout(tooltipTimeout);
+                    tooltipContent.style.opacity = '0';
+                    tooltipContent.style.visibility = 'hidden';
+                }
+            });
+        }
 
         // Блокируем сохранение фильтров, если есть ошибка в цене или этаже
         function saveFilters() {
