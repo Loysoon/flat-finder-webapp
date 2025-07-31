@@ -372,7 +372,7 @@
 
         <div class="filter-group">
             <h3>🚇 Метро</h3>
-            <button class="toggle-option" id="metro-toggle" style="margin-bottom: 8px;">🚇 Выбрать станции метро</button>
+            <button class="toggle-option" id="metro-toggle" style="margin-bottom: 8px;">🚇 Выбрать метро</button>
             <div id="metro-search-container" style="display: none;">
                 <div style="margin-bottom: 12px; position:relative;">
                     <input id="metro-search" type="text" placeholder="Поиск станции метро..." class="styled-input" autocomplete="off">
@@ -397,7 +397,7 @@
 
         <div class="filter-group">
             <h3>📍 Расположение</h3>
-            <button class="toggle-option" id="districts-toggle" style="margin-bottom: 8px;">📍 Выбрать районы</button>
+            <button class="toggle-option" id="districts-toggle" style="margin-bottom: 8px;">📍 Выбрать расположение</button>
             <div id="districts-search-container" style="display: none;">
                 <div style="margin-bottom: 12px; position:relative;">
                     <input id="area-search" type="text" placeholder="Поиск района..." class="styled-input" autocomplete="off">
@@ -454,6 +454,11 @@
             <button class="toggle-option" id="not-last-floor" data-value="floornl">🏢 Не последний этаж</button>
         </div>
 
+        <div class="filter-group">
+            <h3>🆕 Новизна объявлений</h3>
+            <button class="toggle-option" id="only-new" data-value="new">🆕 Только новые объявления</button>
+        </div>
+
         <button class="save-btn" onclick="saveFilters()">✅ Сохранить настройки</button>
         <button class="save-btn" style="background:#e74c3c; margin-top:10px;" onclick="showResetModal()">🗑️ Сбросить фильтры</button>
 
@@ -480,6 +485,7 @@
             priceMin: null,
             priceMax: null,
             ownerOnly: false,
+            onlyNew: false,
             metroTime: null,
             metroTransport: null,
             metro: [],
@@ -538,6 +544,12 @@
             if (savedFilters.options && savedFilters.options.includes('is_by_homeowner')) {
                 filters.ownerOnly = true;
                 document.getElementById('owner-only').classList.add('selected');
+            }
+
+            // Только новые объявления
+            if (savedFilters.totime === -2) {
+                filters.onlyNew = true;
+                document.getElementById('only-new').classList.add('selected');
             }
 
             // Время до метро
@@ -1606,6 +1618,11 @@
             filters.notLastFloor = this.classList.contains('selected');
         });
 
+        document.getElementById('only-new').addEventListener('click', function() {
+            this.classList.toggle('selected');
+            filters.onlyNew = this.classList.contains('selected');
+        });
+
         // Блокируем сохранение фильтров, если есть ошибка в цене или этаже
         function saveFilters() {
             const priceMin = getNumericValue(document.getElementById('price-min').value);
@@ -1635,6 +1652,7 @@
                 priceMin: null,
                 priceMax: null,
                 ownerOnly: false,
+                onlyNew: false,
                 metroTime: null,
                 metroTransport: null,
                 metro: [],
@@ -1796,6 +1814,8 @@
             let options = [];
             // Собственник
             if (filters.ownerOnly) options.push("is_by_homeowner");
+            // Только новые объявления
+            if (filters.onlyNew) result.totime = -2;
             // Удобства
             if (filters.amenities && Array.isArray(filters.amenities)) {
                 options = options.concat(filters.amenities);
@@ -1866,10 +1886,10 @@
             const isVisible = metroContainer.style.display !== 'none';
             if (isVisible) {
                 metroContainer.style.display = 'none';
-                this.textContent = '🚇 Выбрать станции метро';
+                this.textContent = '🚇 Выбрать метро';
             } else {
                 metroContainer.style.display = 'block';
-                this.textContent = '🚇 Скрыть станции метро';
+                this.textContent = '🚇 Скрыть метро';
             }
         });
 
@@ -1878,10 +1898,10 @@
             const isVisible = districtsContainer.style.display !== 'none';
             if (isVisible) {
                 districtsContainer.style.display = 'none';
-                this.textContent = '📍 Выбрать районы';
+                this.textContent = '📍 Выбрать расположение';
             } else {
                 districtsContainer.style.display = 'block';
-                this.textContent = '📍 Скрыть районы';
+                this.textContent = '📍 Скрыть расположение';
             }
         });
 
